@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เวลาเข้าออกงาน</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .card-header {
+            background-color: #6a5a46;
+            color: white;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            background-color: #6a5a46;
+            border-color: #6a5a46;
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            background-color: #5c4e3f;
+            border-color: #5c4e3f;
+        }
+
+        .pagination .page-link {
+            color: #6a5a46;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #5c4e3f;
+            border-color: #5c4e3f;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #6a5a46;
+            border-color: #6a5a46;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>เวลาเข้าออกงาน</h4>
+            </div>
+            <div class="card-body">
+                <form id="time-form">
+                    <button type="button" class="btn btn-primary" id="checkInButton"
+                        onclick="checkIn()">บันทึกเวลาเข้า</button>
+                    <button type="button" class="btn btn-secondary" id="checkOutButton" onclick="checkOut()"
+                        disabled>บันทึกเวลาออก</button>
+                </form>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header text-center">
+                <h4>ประวัติการเข้าออกงาน</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>วันที่</th>
+                            <th>เวลาเข้า</th>
+                            <th>เวลาออก</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable">
+                        <!-- Records will be added here dynamically -->
+                    </tbody>
+                </table>
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                            <button class="page-link" onclick="previousPage()">ย้อนกลับ</button>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" onclick="nextPage()">หน้าถัดไป</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let checkInTime = null;
+        const currentDate = new Date().toISOString().split('T')[0]; // MySQL DATE format YYYY-MM-DD
+        const recordsPerPage = 5;
+        let currentPage = 1;
+        let records = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            checkDailyStatus();
+            fetchTimestamps();
+        });
+
+        function checkDailyStatus() {
+            const lastCheckInDate = localStorage.getItem('lastCheckInDate');
+            const lastCheckOutDate = localStorage.getItem('lastCheckOutDate');
+
+            if (lastCheckInDate === currentDate) {
+                document.getElementById('checkInButton').disabled = true;
+                document.getElementById('checkOutButton').disabled = false;
+            }
+
+            if (lastCheckOutDate === currentDate) {
+                document.getElementById('checkInButton').disabled = true;
+                document.getElementById('checkOutButton').disabled = true;
+            }
+        }
+
+        function checkIn() {
+            checkInTime = getCurrentTime();
+
+            if (checkInTime) {
+                document.getElementById('checkInButton').disabled = true;
+                document.getElementById('checkOutButton').disabled = false;
+                alert(`เวลาเข้า: ${checkInTime}`);
+                localStorage.setItem('lastCheckInDate', currentDate);
+
+                // Prepare data to send to the server
+                const userId = sessionStorage.getItem('user_id');
+                const data = {
+                    user_id: userId,
+                    date_tt: currentDate,
+                    times_tt: checkInTime
+                };
+
+                // Send data to the server
+                const addRequestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data),
+                    redirect: "follow"
+                };
+
+                fetch("http://localhost:4025/user/add_timestamp", addRequestOptions)
+                    .then(response => response.text())
+                    .then(result => {
+                        console.log(result);
+                        // Fetch timestamps again to refresh the table
+                        fetchTimestamps();
+                    })
+                    .catch(error => console.error(error));
+            } else {
+                alert('เกิดข้อผิดพลาดในการบันทึกเวลาเข้า');
+            }
+        }
+
+        function checkOut() {
+            const checkOutTime = getCurrentTime();
+
+            if (checkOutTime) {
+                document.getElementById('checkInButton').disabled = true;
+                document.getElementById('checkOutButton').disabled = true;
+                alert(`เวลาออก: ${checkOutTime}`);
+                localStorage.setItem('lastCheckOutDate', currentDate);
+
+                // Prepare data to send to the server
+                const userId = sessionStorage.getItem('user_id');
+                const data = {
+                    user_id: userId,
+                    date_tt: currentDate,
+                    timee_tt: checkOutTime
+                };
+
+                // Send data to the server
+                const updateRequestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data),
+                    redirect: "follow"
+                };
+
+                fetch("http://localhost:4025/user/update_timestamp", updateRequestOptions)
+                    .then(response => response.text())
+                    .then(result => {
+                        console.log(result);
+                        // Fetch timestamps again to refresh the table
+                        fetchTimestamps();
+                    })
+                    .catch(error => console.error(error));
+            } else {
+                alert('เกิดข้อผิดพลาดในการบันทึกเวลาออก');
+            }
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function fetchTimestamps() {
+            const userId = sessionStorage.getItem('user_id');
+            const data = { user_id: userId };
+
+            fetch("http://localhost:4025/user/get_timestamp_byuser_id", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    records = result;
+                    records.sort((a, b) => new Date(b.date_tt) - new Date(a.date_tt));
+                    displayTimestamps();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayTimestamps() {
+            const recordsTable = document.getElementById('recordsTable');
+            recordsTable.innerHTML = '';
+
+            const start = (currentPage - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+            const paginatedRecords = records.slice(start, end);
+
+            paginatedRecords.forEach(record => {
+                const row = document.createElement('tr');
+                const formattedDate = formatDate(record.date_tt);
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${record.times_tt || '-'}</td>
+                    <td>${record.timee_tt || '-'}</td>
+                `;
+                recordsTable.appendChild(row);
+            });
+
+            // Update pagination buttons state
+            document.querySelector('.pagination .page-item:first-child').classList.toggle('disabled', currentPage === 1);
+            document.querySelector('.pagination .page-item:last-child').classList.toggle('disabled', end >= records.length);
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', options);
+        }
+
+        function nextPage() {
+            if (currentPage * recordsPerPage < records.length) {
+                currentPage++;
+                displayTimestamps();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayTimestamps();
+            }
+        }
+    </script>
+</body>
+
+</html>

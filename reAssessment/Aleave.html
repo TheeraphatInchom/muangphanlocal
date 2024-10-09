@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Sarabun', sans-serif;
+            overflow: hidden;
+            /* Hide overflow on both x and y axes */
+        }
+
+        .site-header {
+            background: linear-gradient(90deg, yellow, #ffa200);
+            padding: 10px 0;
+            /* ปรับขนาดช่องว่างตามต้องการ */
+        }
+
+        .custom-button {
+            border-radius: 5px;
+            /* ให้มุมมน */
+            padding: 8px 15px;
+            /* ขนาดปุ่ม */
+            transition: background-color 0.3s, transform 0.3s;
+            /* การเปลี่ยนแปลง */
+        }
+
+        .custom-button:hover {
+            transform: translateY(-2px);
+            /* เพิ่มเอฟเฟกต์เล็กน้อยเมื่อชี้ */
+        }
+
+
+        .site-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .full-height {
+            height: calc(100% - 60px);
+            /* Adjust header height */
+        }
+
+        .tab-content {
+            height: 100%;
+            overflow: hidden;
+            /* Ensure no overflow in tab content */
+        }
+
+        .tab-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .custom-color {
+            background-color: #6a5a46;
+            border-color: #6a5a46;
+            color: white;
+            cursor: pointer !important;
+        }
+
+        .btn-info:hover {
+            background-color: #ffffff;
+            border-color: #6a5a46;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="site-logo">องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</h1>
+            <!-- Adjust the container to align the buttons next to each other -->
+            <div class="d-flex align-items-center bg-white p-2 rounded shadow-sm">
+                <button id="settingsButton" class="custom-button me-2" style="background-color: #6a5a46; color: white; border-radius: 5px; padding: 8px 15px; border: none; transition: background-color 0.3s, transform 0.3s;">
+                    จัดการระบบ
+                </button>
+                <button id="logoutButton" class="custom-button btn btn-danger">ออกจากระบบ</button>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Tab navigation -->
+    <div class="container mt-4">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button"
+                    role="tab" aria-controls="tab1" aria-selected="true">คำขอการลา</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button"
+                    role="tab" aria-controls="tab2" aria-selected="false">คำขอยกเลิกการลา</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button"
+                    role="tab" aria-controls="tab3" aria-selected="false">คำขอที่ได้รับอนุมัติ</button>
+            </li>
+        </ul>
+        <div class="tab-content mt-2" id="myTabContent">
+            <div class="tab-pane fade show active full-height" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                <iframe src="/reAssessment/leavetable/table_l1.html" frameborder="0" height="100%"
+                    width="100%"></iframe>
+            </div>
+            <div class="tab-pane fade full-height" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                <iframe src="/reAssessment/leavetable/table_l2.html" frameborder="0" height="100%"
+                    width="100%"></iframe>
+            </div>
+            <div class="tab-pane fade full-height" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+                <iframe src="/reAssessment/leavetable/table_l3.html" frameborder="0" height="100%"
+                    width="100%"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to handle logout button click
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            sessionStorage.removeItem("user_id");
+            sessionStorage.removeItem("user_st");
+            sessionStorage.removeItem("user_status");
+            window.location.href = "/index.html";
+        });
+
+        // Function to handle settings button click
+        document.getElementById("settingsButton").addEventListener("click", () => {
+            window.location.href = "/Ahome.html";
+        });
+
+        // Function to resize iframes to full screen height
+        function resizeIframe() {
+            var iframes = document.querySelectorAll('iframe');
+            for (var i = 0; i < iframes.length; i++) {
+                iframes[i].style.height = window.innerHeight + 'px';
+            }
+        }
+
+        // Resize iframes on page load and window resize
+        window.addEventListener('DOMContentLoaded', resizeIframe);
+        window.addEventListener('resize', resizeIframe);
+
+        // Resize iframes when switching tabs
+        document.querySelectorAll('.nav-link').forEach(item => {
+            item.addEventListener('click', function () {
+                resizeIframe();
+            });
+        });
+    </script>
+</body>
+
+</html>

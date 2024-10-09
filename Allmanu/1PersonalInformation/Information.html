@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Example</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+  #userInformationFields > .col-md-4 {
+    display: inline-block;
+    margin-right: -4px; /* ลบระยะห่างขวา */
+  }
+
+  </style>
+</style>
+
+<body>
+  <div class="container mt-5">
+    <form>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label for="national" class="form-label">รหัสประจำตัวประชาชน</label>
+          <input type="text" class="form-control" id="national"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 13);">
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="status_t" class="form-label">สถานภาพ</label>
+          <select class="form-select" id="status_t">
+            <option value="" disabled selected>-- เลือกสถานภาพ --</option>
+            <option value="โสด">โสด</option>
+            <option value="สมรส">สมรส</option>
+          </select>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="name" class="form-label">ขื่อ – นามสกุล</label>
+          <input type="text" class="form-control" id="name" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="birthdate" class="form-label">วันเกิด</label>
+          <input type="date" class="form-control" id="birthdate" >
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
+          <select class="form-select" id="blood_group">
+            <option value="" disabled selected>-- เลือกกรุ๊ปเลือด --</option>
+            <option value="AB">AB</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="O">O</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="nationality" class="form-label">สัญชาติ</label>
+          <input type="text" class="form-control" id="nationality" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="ethnicity" class="form-label">เชื้อชาติ</label>
+          <input type="text" class="form-control" id="ethnicity" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="tp_number" class="form-label">เบอร์โทรศัพท์</label>
+          <input type="text" class="form-control" id="tp_number"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="email" class="form-label">อีเมล์</label>
+          <input type="email" class="form-control" id="email" placeholder="กรุณาใส่อีเมล์">
+          <div class="invalid-feedback">
+            กรุณาใส่อีเมล์ที่ถูกต้อง
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <label for="date_entry" class="form-label">วันที่เข้างาน</label>
+          <input type="date" class="form-control" id="date_entry" >
+        </div>
+        <div class="col-md-4 mb-4">
+          <label for="workingLife" class="form-label">อายุการทำงาน</label>
+          <input type="text" class="form-control" id="workingLife" >
+        </div>
+        <div class="col-md-4 mb-4">
+          <label for="retirement" class="form-label">วันที่เกษียณ</label>
+          <input type="date" class="form-control" id="retirement" >
+        </div>
+        <div class="row" id="userInformationFields" style="display: none;">
+          <div class="col-md-4 mb-3">
+            <label for="username" class="form-label">ชื่อผู้ใช้งาน</label>
+            <input type="text" class="form-control" id="username" maxlength="10" >
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="password" class="form-label">รหัสผ่าน</label>
+            <input type="text" class="form-control" id="password" maxlength="10" >
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="user_status" class="form-label">สิทธิการเข้าถึง</label>
+            <select class="form-select" id="user_status">
+              <option value="" disabled selected>-- เลือกสิทธิการเข้าถึง --</option>
+              <option value="user">ผู้ใช้งานทั่วไป</option>
+              <option value="admin">ผู้ดูแล</option>
+            </select>
+          </div>
+        </div>        
+      </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary"
+          style="background-color: #6a5a46; border-color: #6a5a46;">อัพเดทข้อมูล</button>
+      </div>
+    </form>
+  </div>
+</body>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const userStatus = sessionStorage.getItem('user_status');
+    if (userStatus === 'admin') {
+      document.getElementById('userInformationFields').style.display = 'block';
+    } else {
+      document.getElementById('userInformationFields').style.display = 'none';
+    }
+  });
+  function addOneDay(dateStr) {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + 1); // Add one day
+    // Convert back to YYYY-MM-DD format
+    const year = date.getFullYear();
+    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ensure month is 2 digits
+    let day = date.getDate().toString().padStart(2, '0'); // Ensure day is 2 digits
+    return `${year}-${month}-${day}`;
+  }
+  // Get user_id from sessionStorage
+  const userId = sessionStorage.getItem('user_id');
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    "id": userId
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+  fetch("http://localhost:4025/user/get_user_byid", requestOptions)
+    .then((response) => response.text())
+    .then((result) => {
+      const data = JSON.parse(result);
+      document.getElementById('national').value = data[0].national;
+      document.getElementById('status_t').value = data[0].status_t;
+      document.getElementById('name').value = data[0].name;
+      document.getElementById('birthdate').value = addOneDay(data[0].birthdate.split('T')[0]);
+      document.getElementById('blood_group').value = data[0].blood_group;
+      document.getElementById('nationality').value = data[0].nationality;
+      document.getElementById('ethnicity').value = data[0].ethnicity;
+      document.getElementById('tp_number').value = data[0].tp_number;
+      document.getElementById('email').value = data[0].email;
+      document.getElementById('date_entry').value = addOneDay(data[0].date_entry.split('T')[0]);
+      document.getElementById('retirement').value = addOneDay(data[0].retirement.split('T')[0]);
+      document.getElementById('username').value = data[0].username;
+      document.getElementById('password').value = data[0].password;
+      document.getElementById('user_status').value = data[0].user_status;
+      // คำนวณอายุการทำงาน
+      const entryDate = new Date(data[0].date_entry.split('T')[0]);
+      const currentDate = new Date();
+      const diffTime = Math.abs(currentDate - entryDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      let diffYears = currentDate.getFullYear() - entryDate.getFullYear();
+      let diffMonths = currentDate.getMonth() - entryDate.getMonth();
+      let diffDaysLeft = currentDate.getDate() - entryDate.getDate();
+      if (diffMonths < 0 || (diffMonths === 0 && diffDaysLeft < 0)) {
+        diffYears--;
+        diffMonths += 12;
+      }
+      if (diffDaysLeft < 0) {
+        const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+        diffDaysLeft += prevMonth.getDate();
+        diffMonths--;
+      }
+      if (diffMonths < 0) {
+        diffYears--;
+        diffMonths += 12;
+      }
+      document.getElementById('workingLife').value = `${diffYears} ปี ${diffMonths} เดือน ${diffDaysLeft} วัน`;
+    })
+    .catch((error) => console.error(error));
+
+  document.getElementById('userForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    if (!email.includes('@')) {
+      alert('กรุณาใส่อีเมล์ที่ถูกต้อง');
+      return;
+    }
+  });
+</script>
+<script>
+  let confirmed = false;
+  // เปลี่ยนชื่อ function เป็น updateUserData และเพิ่ม event parameter
+  function updateUserData(event) {
+    event.preventDefault(); // ป้องกันการรีเฟรชหน้าเมื่อกดปุ่ม Update
+    if (!confirmed) {
+      if (confirm("คุณแน่ใจหรือว่าต้องการอัพเดทข้อมูล?")) {
+        confirmed = true;
+      } else {
+        alert("การอัพเดทข้อมูลถูกยกเลิก");
+        location.reload(); // รีเซ็ทหน้าเว็บ
+        return; // ยกเลิกการ submit ถ้าผู้ใช้กด "ยกเลิก"
+      }
+    }
+    // รับค่าจาก input fields
+    const national = document.getElementById('national').value;
+    const status_t = document.getElementById('status_t').value;
+    const name = document.getElementById('name').value;
+    const blood_group = document.getElementById('blood_group').value;
+    const nationality = document.getElementById('nationality').value;
+    const ethnicity = document.getElementById('ethnicity').value;
+    const tp_number = document.getElementById('tp_number').value;
+    const email = document.getElementById('email').value;
+    const userId = sessionStorage.getItem('user_id');
+    const birthdate = document.getElementById('birthdate').value;
+    const dateEntry = document.getElementById('date_entry').value;
+    const retirement = document.getElementById('retirement').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const user_status = document.getElementById('user_status').value;
+    // สร้าง JSON object สำหรับส่งข้อมูล
+    const data = {
+      "id": userId,
+      "national": national,
+      "status_t":status_t,
+      "name": name,
+      "blood_group": blood_group,
+      "nationality": nationality,
+      "ethnicity": ethnicity,
+      "tp_number": tp_number,
+      "email": email,
+      "birthdate": birthdate,
+      "date_entry": dateEntry,
+      "retirement": retirement,
+      "username": username,
+      "password": password,
+      "user_status": user_status
+    };
+    // ส่ง request ไปยัง API update_userdetails ด้วย fetch
+    fetch("http://localhost:4025/user/update_userdetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'ok') {
+          alert(result.message);
+          location.reload();
+        } else {
+          alert('Failed to update user details');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('An error occurred while updating user details');
+      });
+  }
+  // เพิ่ม event listener สำหรับ form submission
+  document.querySelector('form').addEventListener('submit', updateUserData);
+  if (sessionStorage.getItem('user_status') === 'user') {
+    // Set the retirement input field to readonly
+    document.getElementById('date_entry').setAttribute('readonly', 'readonly');
+    document.getElementById('retirement').setAttribute('readonly', 'readonly');
+  } else {
+    // Remove the readonly attribute from the retirement input field
+    document.getElementById('date_entry').removeAttribute('readonly');
+    document.getElementById('retirement').removeAttribute('readonly');
+  }
+</script>
+
+</html>

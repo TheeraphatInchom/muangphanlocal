@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form to PDF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- jQuery UI -->
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<style>
+    .ui-autocomplete {
+        z-index: 1070 !important;
+        /* Higher than modal z-index */
+        position: absolute;
+    }
+
+</style>
+<body>
+    <div class="container mt-5">
+        <h3 class="text-center mb-4">แบบใบลาป่วย ลาคลอดบุตร ลากิจส่วนตัว</h3>
+        <form id="vacationForm">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="date_vt" class="form-label">เขียนเมื่อ</label>
+                    <input type="date" class="form-control" id="date_vt" name="date_vt" required>
+                </div>
+                <div class="col-md-2">
+                    <label for="type_vt" class="form-label">ประเภทใบลา</label>
+                    <select class="form-control" id="type_vt" name="type_vt" required>
+                        <option value="">เลือกประเภทใบลา</option>
+                        <option value="ลาป่วย">ลาป่วย</option>
+                        <option value="ลาคลอดบุตร">ลาคลอดบุตร</option>
+                        <option value="ลากิจส่วนตัว">ลากิจส่วนตัว</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="name_vt" class="form-label">ชื่อ</label>
+                    <input type="text" class="form-control" id="name_vt" name="name_vt" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="dates_vt" class="form-label">ลาตั้งแต่วันที่</label>
+                    <input type="date" class="form-control" id="dates_vt" name="dates_vt" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="datee_vt" class="form-label">สิ้นสุดวันที่</label>
+                    <input type="date" class="form-control" id="datee_vt" name="datee_vt" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="position" class="form-label">ตำแหน่ง</label>
+                    <input type="text" class="form-control" id="position" name="position" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="affiliation" class="form-label">สังกัด</label>
+                    <select class="form-select" id="affiliation" name="affiliation" required>
+                        <option value="" disabled selected>-- เลือกสังกัด --</option>
+                        <option value="สำนักปลัด อบต.">สำนักปลัด อบต.</option>
+                        <option value="กองคลัง">กองคลัง</option>
+                        <option value="กองช่าง">กองช่าง</option>
+                        <option value="กองสาธารณสุข">กองสาธารณสุข</option>
+                        <option value="กองการศึกษา">กองพัฒนาชุมชน</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="contact" class="form-label">ติดต่อข้าพเจ้าได้ที่</label>
+                    <input type="text" class="form-control" id="contact" name="contact" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label for="assigned" class="form-label">ข้าพเจ้าได้มอบหมายให้</label>
+                    <input type="text" class="form-control" id="assigned" name="assigned" required>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary"
+                            onclick="showConfirmation()">ยืนยันความถูกต้อง</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- The Modal -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel">ยืนยันความถูกต้อง</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-center">คุณต้องการยืนยันความถูกต้องใช่หรือไม่?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="button" class="btn btn-success" onclick="submitForm()">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Retrieve the user_name from sessionStorage and set it to the input field
+        document.addEventListener("DOMContentLoaded", function () {
+            const userName = sessionStorage.getItem('user_name');
+            if (userName) {
+                document.getElementById('name_vt').value = userName; // Set the input value
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var positions = [
+                "นายกองค์การบริหารส่วนตำบล",
+                "ปลัดองค์การบริหารส่วนตำบล",
+                "หัวหน้าส่วนราชการ",
+                "เจ้าหน้าที่บริหารงานทั่วไป",
+                "เจ้าหน้าที่ธุรการ",
+                "เจ้าหน้าที่บันทึกข้อมูล",
+                "เจ้าหน้าที่การเงินและบัญชี",
+                "นักวิชาการเงินและบัญชี",
+                "เจ้าหน้าที่พัสดุ",
+                "นักวิเคราะห์นโยบายและแผน",
+                "เจ้าหน้าที่พัฒนาชุมชน",
+                "นักพัฒนาชุมชน",
+                "เจ้าหน้าที่สาธารณสุข",
+                "นักวิชาการสาธารณสุข",
+                "พยาบาลวิชาชีพ",
+                "ครูศูนย์พัฒนาเด็กเล็ก",
+                "นักวิชาการศึกษา",
+                "นักวิชาการเกษตร",
+                "นักวิชาการสิ่งแวดล้อม",
+                "เจ้าหน้าที่นิติกร",
+                "เจ้าหน้าที่ธุรการ",
+                "เจ้าหน้าที่บันทึกข้อมูล"
+            ];
+
+            // เปิดใช้งาน autocomplete
+            $("#position").autocomplete({
+                source: positions,
+                minLength: 1
+            });
+        });
+    </script>
+    <script>
+        function showConfirmation() {
+            // Show the modal using Bootstrap's modal method
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+        }
+        function closeModal() {
+            // Close the modal
+            document.getElementById("confirmationModal").style.display = "none";
+        }
+
+        function submitForm() {
+            closeModal();
+            // Handle form submission
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const formData = new FormData(document.getElementById('vacationForm'));
+            const userId = sessionStorage.getItem('user_id');
+
+            const raw = JSON.stringify({
+                "user_id": userId,
+                "date_vt": formData.get("date_vt"),
+                "type_vt": formData.get("type_vt"),
+                "name_vt": formData.get("name_vt"),
+                "position": formData.get("position"),
+                "affiliation": formData.get("affiliation"),
+                "dates_vt": formData.get("dates_vt"),
+                "datee_vt": formData.get("datee_vt"),
+                "total_day": Math.ceil((new Date(formData.get("datee_vt")) - new Date(formData.get("dates_vt"))) / (1000 * 60 * 60 * 24)) + 1,
+                "contact": formData.get("contact"),
+                "assigned": formData.get("assigned"),
+                "status": "รอดำเนินการ"
+            });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4025/user/add_vacation", requestOptions)
+                .then((response) => response.text())
+                .then((result) => {
+                    console.log(result);
+                    // After successfully posting to the first endpoint, redirect to the PDF page
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/pdf/p2.php';
+                    form.target = '_blank'; // Open in a new tab
+
+                    // Add form data to be sent
+                    formData.forEach((value, key) => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        form.appendChild(input);
+                    });
+
+                    // Append the form to the body and submit it
+                    document.body.appendChild(form);
+                    form.submit();
+                })
+                .catch((error) => console.error('Error:', error));
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

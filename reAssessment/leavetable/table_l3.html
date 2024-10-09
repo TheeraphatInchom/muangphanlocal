@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .container-fluid {
+            width: 100%;
+            padding: 0;
+        }
+
+        .table-container {
+            padding: 15px;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="table-container">
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="ค้นหาด้วยชื่อ">
+            <table class="table table-striped table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th scope="col">วันที่เขียน</th>
+                        <th scope="col">ประเภทใบลา</th>
+                        <th scope="col">ชื่อ - นามสกุล</th>
+                        <th scope="col">ลาตั้งแต่วันที่</th>
+                        <th scope="col">สิ้นสุดวันที่</th>
+                        <th scope="col">รวมเป็นกี่วัน</th>
+                        <th scope="col">สถานะ</th>
+                        <th scope="col">ตัวเลือก</th>
+                    </tr>
+                </thead>
+                <tbody id="childTableBody">
+                    <!-- Table rows will be dynamically added here -->
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center">
+                <button id="prevPageBtn" class="btn btn-primary me-2" aria-label="Previous Page">ย้อนกลับ</button>
+                <button id="nextPageBtn" class="btn btn-primary" aria-label="Next Page">หน้าถัดไป</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">ยืนยันข้อมูลการส่ง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmContent">Are you sure you want to send this data?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Convert a date string to Thai date format
+        function formatThaiDate(dateString) {
+            const monthsThai = [
+                'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+            ];
+            const date = new Date(dateString);
+            date.setDate(date.getDate() + 1); // Add 1 day
+            const day = date.getUTCDate();
+            const month = monthsThai[date.getUTCMonth()];
+            const year = date.getUTCFullYear() + 543; // Convert to Buddhist year
+            return `${day} ${month} ${year}`;
+        }
+
+        function sendRowData(rowData) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+
+            // Determine the action URL based on type_vt
+            let actionUrl;
+            if (rowData.type_vt === 'ลาพักผ่อน') {
+                actionUrl = '/pdf/p1.php';
+            } else if (['ลาป่วย', 'ลาคลอดบุตร', 'ลากิจส่วนตัว'].includes(rowData.type_vt)) {
+                actionUrl = '/pdf/p2.php';
+            }
+            if (['ยกเลิกเสร็จสิ้น'].includes(rowData.status)) {
+                actionUrl = '/pdf/p3.php';
+            }
+
+            if (!actionUrl) {
+                alert('Unsupported type or status');
+                return;
+            }
+
+            form.action = actionUrl;
+            form.target = '_blank'; // Open in a new tab
+
+            Object.keys(rowData).forEach(key => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                if (key.includes('date')) {
+                    const date = new Date(rowData[key]);
+                    date.setDate(date.getDate() + 1); // Add 1 day
+                    input.value = date.toISOString().split('T')[0];
+                } else {
+                    input.value = rowData[key];
+                }
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        function showConfirmationModal(rowData) {
+            const modalElement = document.getElementById('confirmModal');
+            const modal = new bootstrap.Modal(modalElement);
+            const confirmBtn = document.getElementById('confirmBtn');
+            const confirmContent = document.getElementById('confirmContent');
+            confirmContent.textContent = `Are you sure you want to send this data for ${rowData.name_vt}?`;
+
+            const onConfirmClick = () => {
+                sendRowData(rowData);
+                modal.hide();
+                confirmBtn.removeEventListener('click', onConfirmClick);
+            };
+
+            confirmBtn.addEventListener('click', onConfirmClick);
+
+            modal.show();
+        }
+
+        function updateLeaveStatus(rowData, status) {
+            rowData.status = status;
+            fetch('http://localhost:4025/user/update_status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(rowData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    alert('Status updated successfully');
+                    fetchAndDisplayData(currentPage);
+                })
+                .catch(error => {
+                    console.error('There was an error!', error);
+                    alert('Failed to update status');
+                });
+        }
+
+        let currentPage = 1;
+        const entriesPerPage = 6;
+        let allData = [];
+
+        function displayData(currentPage, data) {
+            const startIndex = (currentPage - 1) * entriesPerPage;
+            const slicedData = data.slice(startIndex, startIndex + entriesPerPage);
+
+            const tableBody = document.getElementById("childTableBody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            slicedData.forEach((child) => {
+                const newRow = tableBody.insertRow();
+                newRow.insertCell().textContent = formatThaiDate(child.date_vt);
+                newRow.insertCell().textContent = child.type_vt;
+                newRow.insertCell().textContent = child.name_vt;
+                newRow.insertCell().textContent = formatThaiDate(child.dates_vt);
+                newRow.insertCell().textContent = formatThaiDate(child.datee_vt);
+                newRow.insertCell().textContent = child.total_day;
+                newRow.insertCell().textContent = child.status;
+
+                const viewBtnCell = newRow.insertCell();
+                const viewBtn = document.createElement('button');
+                viewBtn.textContent = 'ดูใบคำขอ';
+                viewBtn.className = 'btn btn-info me-2';
+                viewBtn.setAttribute('aria-label', `View request for ${child.name_vt}`);
+                viewBtn.addEventListener('click', () => {
+                    showConfirmationModal(child);
+                });
+                viewBtnCell.appendChild(viewBtn);
+
+                // const approveBtn = document.createElement('button');
+                // approveBtn.textContent = 'อนุมัติ';
+                // approveBtn.className = 'btn btn-success me-2';
+                // approveBtn.setAttribute('aria-label', `Approve request for ${child.name_vt}`);
+                // approveBtn.addEventListener('click', () => {
+                //     if (confirm(`Are you sure you want to approve leave for ${child.name_vt}?`)) {
+                //         updateLeaveStatus(child, 'ยกเลิกเสร็จสิ้น');
+                //     }
+                // });
+                // viewBtnCell.appendChild(approveBtn);
+
+                // if (child.status === 'เสร็จสิ้น') {
+                //     const cancelBtn = document.createElement('button');
+                //     cancelBtn.textContent = 'ยกเลิก';
+                //     cancelBtn.className = 'btn btn-danger';
+                //     cancelBtn.setAttribute('aria-label', `Cancel request for ${child.name_vt}`);
+                //     cancelBtn.addEventListener('click', () => {
+                //         if (confirm(`Are you sure you want to cancel leave for ${child.name_vt}?`)) {
+                //             updateLeaveStatus(child, 'รอยกเลิกวันลา');
+                //         }
+                //     });
+                //     viewBtnCell.appendChild(cancelBtn);
+                // }
+            });
+        }
+
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            currentPage++;
+            fetchAndDisplayData(currentPage);
+        });
+
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchAndDisplayData(currentPage);
+            }
+        });
+
+        document.getElementById("searchInput").addEventListener("input", (event) => {
+            const searchValue = event.target.value.toLowerCase();
+            const filteredData = allData.filter(child => child.name_vt.toLowerCase().includes(searchValue));
+            displayData(1, filteredData);
+        });
+
+        function fetchAndDisplayData(page) {
+            const userId = sessionStorage.getItem('user_id');
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                "user_id": userId,
+                "page": page,
+                "entriesPerPage": entriesPerPage
+            });
+
+            const requestOptions = {
+                method: "GET",
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4025/user/get_vacationall3", requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    data.sort((a, b) => new Date(b.date_vt) - new Date(a.date_vt)); // Sort by latest date
+                    allData = data;
+                    displayData(currentPage, data); // Display data for the current page
+                })
+                .catch((error) => console.log("error", error));
+        }
+
+        // Initial fetch and display for the first page
+        fetchAndDisplayData(currentPage);
+    </script>
+</body>
+
+</html>

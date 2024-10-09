@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body,
+        html {
+            height: 100%;
+        }
+
+        .container {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        form {
+            max-width: 500px; /* Limit the width of the form */
+        }
+    </style>
+</head>
+
+<body class="d-flex justify-content-center">
+    <div class="container d-flex flex-column justify-content-start align-items-center mt-3">
+        <form class="w-100" id="userForm">
+            <div class="mb-3" style="display: none;">
+                <label for="status_t" class="form-label">สถานภาพ</label>
+                <select class="form-select" id="status_t" onchange="handleStatusChange()">
+                    <option value="โสด">โสด</option>
+                    <option value="สมรส">สมรส</option>
+                    <option value="อย่าร้าง">อย่าร้าง</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="name_t" class="form-label">ชื่อ – นามสกุล</label>
+                <input type="text" class="form-control" id="name_t" required>
+            </div>
+            <div class="mb-3">
+                <label for="age" class="form-label">อายุ</label>
+                <input type="text" class="form-control" id="age" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="age_t" class="form-label">วันเกิด</label>
+                <input type="date" class="form-control" id="age_t" required>
+            </div>
+            <div class="mb-3">
+                <label for="telephone_t" class="form-label">เบอร์โทรศัพท์</label>
+                <input type="text" class="form-control" id="telephone_t"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);" required>
+            </div>
+            <div class="mb-3">
+                <label for="occupation_t" class="form-label">อาชีพ</label>
+                <select class="form-select" id="occupation_t" required>
+                    <option value="" disabled selected>-- เลือกอาชีพ --</option>
+                    <option value="พนักงานบริษัท">พนักงานบริษัท</option>
+                    <option value="พนักงานรัฐบาล">พนักงานรัฐบาล</option>
+                    <option value="นักเรียน/นักศึกษา">นักเรียน/นักศึกษา</option>
+                    <option value="พนักงานขาย">พนักงานขาย</option>
+                    <option value="คนงาน/แรงงาน">คนงาน/แรงงาน</option>
+                    <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                    <option value="พนักงานบริการ">พนักงานบริการ</option>
+                    <option value="วิทยากร/อาจารย์">วิทยากร/อาจารย์</option>
+                    <option value="นักเขียน/นักบรรณาธิการ">นักเขียน/นักบรรณาธิการ</option>
+                    <option value="นักวิจัย/นักวิทยาศาสตร์">นักวิจัย/นักวิทยาศาสตร์</option>
+                    <option value="พนักงานรัฐวิสาหกิจ">พนักงานรัฐวิสาหกิจ</option>
+                </select>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary"
+                    style="background-color: #6a5a46; border-color: #6a5a46;">อัพเดทข้อมูล</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+<script>
+    const handleStatusChange = () => {
+        const status = document.getElementById('status_t').value;
+        if (status === 'โสด') {
+            // Clear all the input fields
+            document.getElementById('name_t').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('age_t').value = '';
+            document.getElementById('telephone_t').value = '';
+            document.getElementById('occupation_t').value = '';
+
+            // Disable all input fields
+            document.getElementById('name_t').disabled = true;
+            document.getElementById('age').disabled = true;
+            document.getElementById('age_t').disabled = true;
+            document.getElementById('telephone_t').disabled = true;
+            document.getElementById('occupation_t').disabled = true;
+        } else {
+            // Enable all input fields if status is not 'โสด'
+            document.getElementById('name_t').disabled = false;
+            document.getElementById('age').disabled = false;
+            document.getElementById('age_t').disabled = false;
+            document.getElementById('telephone_t').disabled = false;
+            document.getElementById('occupation_t').disabled = false;
+        }
+    };
+
+    const addOneDay = (dateStr) => {
+        const date = new Date(dateStr);
+        date.setDate(date.getDate() + 1);
+        return date.toISOString().split('T')[0];
+    };
+
+    const fetchUserData = async () => {
+        const userId = sessionStorage.getItem('user_id');
+        const response = await fetch("http://localhost:4025/user/get_user_byid", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: userId })
+        });
+
+        const data = await response.json();
+        if (data && data.length) {
+            const user = data[0];
+            document.getElementById('status_t').value = user.status_t;
+            document.getElementById('name_t').value = user.name_t;
+            document.getElementById('telephone_t').value = user.telephone_t;
+            document.getElementById('occupation_t').value = user.occupation_t;
+
+            const birthDate = new Date(user.age_t);
+            const age = calculateAge(birthDate);
+            document.getElementById('age').value = `${age.years} ปี ${age.months} เดือน`;
+            document.getElementById('age_t').value = addOneDay(user.age_t);
+            if (user.status_t === 'โสด') handleStatusChange();
+        }
+    };
+
+    const calculateAge = (birthDate) => {
+        const currentDate = new Date();
+        let years = currentDate.getFullYear() - birthDate.getFullYear();
+        let months = currentDate.getMonth() - birthDate.getMonth();
+
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        return { years, months };
+    };
+
+    const updateUserData = async (event) => {
+        event.preventDefault();
+        const confirmed = confirm("คุณแน่ใจหรือว่าต้องการอัพเดทข้อมูล?");
+        if (!confirmed) {
+            alert("การอัพเดทข้อมูลถูกยกเลิก");
+            return;
+        }
+
+        const userId = sessionStorage.getItem('user_id');
+        const data = {
+            id: userId,
+            status_t: document.getElementById('status_t').value,
+            name_t: document.getElementById('name_t').value,
+            age_t: document.getElementById('age_t').value,
+            telephone_t: document.getElementById('telephone_t').value,
+            occupation_t: document.getElementById('occupation_t').value
+        };
+
+        const response = await fetch("http://localhost:4025/user/update_spouse", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.status === 'ok') {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert("ไม่สามารถอัพเดทข้อมูลได้");
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', fetchUserData);
+    document.getElementById('userForm').addEventListener('submit', updateUserData);
+</script>
+
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Table Example</title>
+    <!-- Import Bootstrap 5 CSS file -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-end">
+            <button id="addChildBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">เพิ่ม</button>
+        </div>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">ชื่อตำแหน่ง</th>
+                    <th scope="col">รายละเอียด</th>
+                    <th scope="col">ชื่อองค์กร / บริษัท</th>
+                    <th scope="col">เริ่ม - สิ้นสุด</th>
+                    <th scope="col" id="optionsHeader" style="text-align: center;"></th>
+                </tr>
+            </thead>
+            <tbody id="childTableBody">
+                <!-- Table rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center">
+            <button id="prevPageBtn" class="btn btn-primary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">ย้อนกลับ</button>
+            <button id="nextPageBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">หน้าถัดไป</button>
+        </div>
+    </div>
+    <div class="modal fade" id="addChildModal" tabindex="-1" aria-labelledby="addChildModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addChildModalLabel">ประวัติการทำงานอื่นๆ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addChildForm">
+                        <div class="mb-3">
+                            <label for="positiono_w" class="form-label">ชื่อตำแหน่ง</label>
+                            <input type="text" class="form-control" id="positiono_w" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="detailso_w" class="form-label">รายละเอียด</label>
+                            <input type="text" class="form-control" id="detailso_w" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="companyo_w" class="form-label">ชื่อองค์กร / บริษัท</label>
+                            <input type="text" class="form-control" id="companyo_w" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="periodso_w" class="form-label">วันที่เริ่ม</label>
+                                <input type="date" class="form-control" id="periodso_w" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="periodeo_w" class="form-label">วันที่สิ้นสุด</label>
+                                <input type="date" class="form-control" id="periodeo_w" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="submitChildBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">ยืนยันการลบ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    คุณแน่ใจหรือไม่ที่ต้องการลบข้อมูลนี้?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeleteButton">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+         function closeModal() {
+            location.reload(); // โหลดหน้าเว็บใหม่
+            document.getElementById("addChildModal").classList.remove("show"); // ปิด modal
+            document.body.classList.remove("modal-open"); // ปิดใช้งาน modal-open class ใน body
+            document.body.style.paddingRight = ""; // ล้างการกำหนด paddingRight ใน body
+        }
+        // Inside renderTablePage function
+        if (sessionStorage.getItem('user_status') === 'admin'|| sessionStorage.getItem('user_status') === 'user') {
+            const optionsHeader = document.getElementById('optionsHeader');
+            optionsHeader.textContent = 'ตัวเลือก';
+        }
+        window.onload = function () {
+            // Check the 'user_status' from sessionStorage
+            if (sessionStorage.getItem('user_status') === 'a') {
+                // Select the optionsHeader element
+                const optionsHeader = document.getElementById('optionsHeader');
+                const addChildBtn = document.getElementById('addChildBtn');
+                // Check if the optionsHeader element exists
+                if (optionsHeader) {
+                    // Remove the optionsHeader element from its parent
+                    optionsHeader.parentNode.removeChild(optionsHeader);
+                }
+                if (addChildBtn) {
+                    // Remove the button element from its parent
+                    addChildBtn.parentNode.removeChild(addChildBtn);
+                }
+            }
+        };
+        // Get user_id from sessionStorage
+        const userId = sessionStorage.getItem('user_id');
+        let allData = [];
+        const pageSize = 6;
+        let currentPage = 1;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            "user_id": userId
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        function renderTablePage(data, pageNumber, pageSize) {
+            const startIndex = (pageNumber - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const sortedData = data.sort((a, b) => new Date(b.periodeo_w) - new Date(a.periodeo_w)); // Sort data by payment date in descending order
+            const pageData = sortedData.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById("childTableBody");
+            tableBody.innerHTML = "";
+
+            pageData.forEach((child) => {
+                const newRow = tableBody.insertRow();
+
+                const positiono_w = newRow.insertCell();
+                positiono_w.textContent = child.positiono_w;
+                const detailso_w = newRow.insertCell();
+                detailso_w.textContent = child.detailso_w;
+                const companyo_w = newRow.insertCell();
+                companyo_w.textContent = child.companyo_w;
+                // Create variables for the date cells
+                const periodso_w = newRow.insertCell();
+                const periodsDate = new Date(child.periodso_w);
+                const formattedPeriodsDate = periodsDate.toLocaleDateString('en-GB');
+                const periodeDate = new Date(child.periodeo_w);
+                const formattedPeriodeDate = periodeDate.toLocaleDateString('en-GB');
+                // Insert formatted dates into the table cell
+                periodso_w.innerHTML = `${formattedPeriodsDate} - ${formattedPeriodeDate}`;
+
+                if (sessionStorage.getItem('user_status') === 'admin' || sessionStorage.getItem('user_status') === 'user' ) {
+                    const optionsCell = newRow.insertCell();
+                    optionsCell.classList.add("d-flex", "justify-content-center");
+                    const editButton = document.createElement("button");
+                    editButton.textContent = "แก้ไข";
+                    editButton.classList.add("btn", "btn-warning", "me-2"); // Added me-2 for spacing
+                    editButton.addEventListener("click", () => {
+                        // Code to handle edit functionality goes here
+                        handleEditButtonClick(child);
+                    });
+                    // Append edit button to the cell
+                    optionsCell.appendChild(editButton);
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "ลบ";
+                    deleteButton.classList.add("btn", "btn-danger");
+                    deleteButton.addEventListener("click", () => {
+                        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        confirmationModal.show();
+
+                        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                        confirmDeleteButton.addEventListener('click', () => {
+                            const childId = child.id;
+
+                            const myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+
+                            const raw = JSON.stringify({
+                                "id": childId
+                            });
+
+                            const requestOptions = {
+                                method: "POST",
+                                headers: myHeaders,
+                                body: raw,
+                                redirect: "follow"
+                            };
+
+                            fetch("http://localhost:4025/user/dalete_otherwork", requestOptions)
+                                .then((response) => response.text())
+                                .then((result) => {
+                                    console.log(result);
+                                    location.reload();
+                                })
+                                .catch((error) => console.error(error));
+                        });
+                    });
+                    optionsCell.appendChild(deleteButton);
+                }
+            });
+        }
+
+        fetch("http://localhost:4025/user/get_otherwork_byuser_id", requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                allData = JSON.parse(result);
+                renderTablePage(allData, currentPage, pageSize);
+            })
+            .catch((error) => console.error(error));
+
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            if (currentPage < Math.ceil(allData.length / pageSize)) {
+                currentPage++;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        const addChildBtn = document.getElementById('addChildBtn');
+        addChildBtn.addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            modal.show();
+        });
+
+        const submitChildBtn = document.getElementById('submitChildBtn');
+        submitChildBtn.addEventListener('click', async () => {
+            const positiono_w = document.getElementById('positiono_w').value;
+            const detailso_w = document.getElementById('detailso_w').value;
+            const companyo_w = document.getElementById('companyo_w').value;
+            const periodso_w = document.getElementById('periodso_w').value;
+            const periodeo_w = document.getElementById('periodeo_w').value;
+
+
+            // Assuming the server expects a JSON payload
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                user_id: userId, // Ensure userId is defined and available
+                positiono_w: positiono_w,
+                detailso_w: detailso_w,
+                companyo_w: companyo_w,
+                periodso_w: periodso_w,
+                periodeo_w: periodeo_w
+            });
+
+            const requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            try {
+                const response = await fetch('http://localhost:4025/user/add_otherwork', requestOptions);
+                const result = await response.json(); // Assuming the server responds with JSON
+                console.log(result);
+                location.reload(); // Refresh the page to show the updated list
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function handleEditButtonClick(child) {
+            const addChildModal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            const startDate = new Date(child.periodso_w.split('T')[0]);
+            const endDate = new Date(child.periodeo_w.split('T')[0]);
+
+            // Add one day to each date
+            startDate.setDate(startDate.getDate() + 1);
+            endDate.setDate(endDate.getDate() + 1);
+
+            // Convert dates back to strings in the YYYY-MM-DD format
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+
+            document.getElementById('positiono_w').value = child.positiono_w;
+            document.getElementById('detailso_w').value = child.detailso_w;
+            document.getElementById('companyo_w').value = child.companyo_w;
+            document.getElementById('periodso_w').value = startDateStr;
+            document.getElementById('periodeo_w').value = endDateStr;
+
+            addChildModal.show();
+
+            // Remove the event listener for the submit button
+            const submitChildBtn = document.getElementById('submitChildBtn');
+            const newSubmitChildBtn = submitChildBtn.cloneNode(true);
+            submitChildBtn.parentNode.replaceChild(newSubmitChildBtn, submitChildBtn);
+
+            const saveButton = document.getElementById('submitChildBtn');
+            saveButton.addEventListener('click', () => {
+                child.positiono_w = document.getElementById('positiono_w').value;
+                child.detailso_w = document.getElementById('detailso_w').value;
+                child.companyo_w = document.getElementById('companyo_w').value;
+                child.periodso_w = document.getElementById('periodso_w').value;
+                child.periodeo_w = document.getElementById('periodeo_w').value;
+
+                const updateRequestOptions = {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: JSON.stringify(child),
+                    redirect: "follow"
+                };
+
+                fetch("http://localhost:4025/user/update_otherwork", updateRequestOptions)
+                    .then((response) => response.text())
+                    .then((result) => {
+                        console.log(result);
+                        location.reload();
+                    })
+                    .catch((error) => console.error(error));
+            });
+        }
+
+    </script>
+</body>
+
+</html>

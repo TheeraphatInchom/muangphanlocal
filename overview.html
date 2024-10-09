@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(yellow, #ffb536);
+            /* Gradient from yellow to white */
+            padding-top: 3.5rem;
+        }
+
+        .sidebar a {
+            color: #333;
+            /* Darker text color for better readability */
+            padding: 0.5rem 1rem;
+            /* Adjust padding for a more compact look */
+            display: flex;
+            /* Use flexbox */
+            align-items: center;
+            /* Vertically center text */
+            justify-content: center;
+            /* Horizontally center text */
+            text-decoration: none;
+            font-weight: 500;
+            /* Medium bold for clarity */
+            font-size: 1rem;
+            /* Smaller font size for better fit */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            /* Softer shadow */
+            letter-spacing: 0.5px;
+            /* Reduced letter spacing */
+            border-radius: 6px;
+            /* Rounded corners for smooth feel */
+            margin: 0;
+            /* Removed margin between links */
+            width: 100%;
+            /* Full width of the sidebar */
+            height: 3rem;
+            /* Control the height of each link */
+            transition: 0.2s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Lighter transparent background */
+        }
+
+        .sidebar a:hover {
+            background-color: #ffa200;
+            /* Bright background on hover */
+            color: white;
+            /* White text for contrast on hover */
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+            /* Softer shadow for depth */
+            transform: scale(1.03);
+            /* Slight zoom effect on hover */
+        }
+
+        .sidebar a.active {
+            background-color: #ffa200;
+            /* Highlight background */
+            color: white;
+            /* White text */
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+            /* Add shadow */
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, yellow, #ffa200);
+            /* Gradient background */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            /* Subtle shadow for depth */
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            /* Larger font size for brand */
+            font-weight: bold;
+            /* Bold font for emphasis */
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 15px;
+            /* Space between nav items */
+        }
+
+
+        .btn-primary {
+            background-color: #6a5a46;
+            /* Bootstrap primary color */
+            color: white;
+            border-radius: 5px;
+            /* Rounded corners */
+            padding: 8px 15px;
+            /* Adjust padding */
+            transition: background-color 0.3s, transform 0.3s;
+            /* Smooth transition */
+        }
+
+        .btn-primary:hover {
+            background-color: #6a5a46;
+            /* Darker blue on hover */
+            transform: translateY(-2px);
+            /* Lift effect on hover */
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            /* Bootstrap danger color */
+            color: white;
+            border-radius: 5px;
+            /* Rounded corners */
+            padding: 8px 15px;
+            /* Adjust padding */
+            transition: background-color 0.3s, transform 0.3s;
+            /* Smooth transition */
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            /* Darker red on hover */
+            transform: translateY(-2px);
+            /* Lift effect on hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar"
+        style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; padding-top: 20px;">
+        <img src="img/logo2.png" alt="Logo" style="width: 80%; margin-bottom: 20px;">
+        <a href="#" id="Link1" onclick="loadContent('Allmanu/Tab1.html')">ข้อมูลส่วนตัว</a>
+        <a href="#" id="Link2" onclick="loadContent('Allmanu/Tab2.html')">ข้อมูลบุคลากร</a>
+        <a href="#" id="Link3" onclick="loadContent('Allmanu/Tab3.html')">ประวัติการศึกษา</a>
+        <a href="#" id="Link4" onclick="loadContent('Allmanu/Tab4.html')">ประวัติสัญญาจ้าง</a>
+        <a href="#" id="Link5" onclick="loadContent('Allmanu/Tab5.html')">ข้อมูลการเงิน</a>
+        <a href="#" id="Link6" onclick="loadContent('Allmanu/Tab6.html')">เครื่องราชอิสริยาภรณ์</a>
+        <a href="#" id="Link7" onclick="loadContent('Allmanu/Tab7.html')">ข้อมูลการประเมิน</a>
+        <a href="#" id="Link8" onclick="loadContent('Allmanu/Tab8.html')">บันทึกกิจกรรม</a>
+        <a href="#" id="Link9" onclick="loadContent('Allmanu/Tab9.html')">ขาด/ลา/มาสาย</a>
+        <a href="#" id="Link10" onclick="loadContent('Allmanu/Tab10.html')">หนังสือคำสั่ง</a>
+        <a href="#" id="Link11" onclick="loadContent('Allmanu/Tab11.html')">กฎหมายน่ารู้</a>
+    </div>
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="overview.html" style="color: black;">องค์การบริหารส่วนตำบลเมืองพาน
+                    จังหวัดเชียงราย</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item d-flex align-items-center">
+                            <div class="d-flex align-items-center bg-white p-2 rounded shadow-sm">
+                                <span id="userNameDisplay" class="me-2"></span>
+                                <a id="adminButton" class="btn btn-primary me-2" style="display:none;">จัดการระบบ</a>
+                                <a id="logoutButton" class="btn btn-danger">ออกจากระบบ</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div id="mainContent" class="container-fluid">
+            <iframe id="contentFrame" src="Allmanu/Tab1.html"
+                style="width: 100%; height: 95vh; border: none; display: block;"></iframe>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function loadContent(url) {
+            document.getElementById('contentFrame').src = url;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var adminButton = document.getElementById('adminButton');
+            var userNameDisplay = document.getElementById('userNameDisplay');
+            var logoutButton = document.getElementById('logoutButton');
+
+            // ตรวจสอบและแสดง user_name จาก sessionStorage
+            var userName = sessionStorage.getItem('user_name');
+            if (userName) {
+                userNameDisplay.textContent = 'ยินดีต้อนรับ : ' + userName; // แสดง user_name
+            }
+
+            // ตรวจสอบว่า sessionStorage มีค่า user_status เป็น admin หรือไม่
+            if (sessionStorage.getItem('user_status') === 'admin') {
+                adminButton.style.display = 'inline-block'; // แสดงปุ่มสำหรับ admin
+            }
+
+            // เพิ่ม Event Listener สำหรับปุ่มหน้าแอดมิน
+            adminButton.addEventListener('click', function () {
+                sessionStorage.setItem('user_name', sessionStorage.getItem('name_admin'));
+                window.location.href = 'Ahome.html'; // ไปยังหน้า Ahome.html เมื่อกดปุ่ม
+            });
+
+            // เพิ่ม Event Listener สำหรับปุ่มออกจากระบบ
+            logoutButton.addEventListener('click', function () {
+                sessionStorage.clear(); // ลบข้อมูลทั้งหมดใน sessionStorage
+                window.location.href = 'index.html'; // นำทางไปยังหน้า index.html
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var links = document.querySelectorAll('.sidebar a'); // Select all sidebar links
+            var personalInfoLink = document.getElementById('Link1'); // Select the 'ข้อมูลส่วนตัว' link
+
+            // Automatically add 'active' class to 'ข้อมูลส่วนตัว' link on page load
+            personalInfoLink.classList.add('active');
+
+            // Add click event listener to each link
+            links.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    // Remove 'active' class from all links
+                    links.forEach(function (link) {
+                        link.classList.remove('active');
+                    });
+                    // Add 'active' class to the clicked link
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

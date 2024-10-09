@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <form>
+            <div class="row">
+                <h5 style="text-align: center; color: red;">ข้อมูลที่อยู่ตามทะเทียนบ้าน</h5>
+                <hr>
+                <div class="col-md-2 mb-3">
+                    <label for="housenum_o" class="form-label">บ้านเลขที่</label>
+                    <input type="text" class="form-control" id="housenum_o">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="village_o" class="form-label">หมู่ที่</label>
+                    <input type="text" class="form-control" id="village_o">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="villagename_o" class="form-label">ชื่อหมู่บ้าน</label>
+                    <input type="text" class="form-control" id="villagename_o">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="alley_o" class="form-label">ซอย</label>
+                    <input type="text" class="form-control" id="alley_o">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="road_o" class="form-label">ถนน</label>
+                    <input type="text" class="form-control" id="road_o">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="district_o" class="form-label">ตำบล</label>
+                    <input type="text" class="form-control" id="district_o">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="prefecture_o" class="form-label">อำเภอ</label>
+                    <input type="text" class="form-control" id="prefecture_o" null>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="province_o" class="form-label">จังหวัด</label>
+                    <input type="text" class="form-control" id="province_o">
+                </div>
+                <div class="col-md-3 mb-4">
+                    <label for="zipcode_o" class="form-label">รหัสไปรษณีย์</label>
+                    <input type="number" class="form-control" id="zipcode_o"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 5);">
+                </div>
+                <hr>
+                <h5 style="text-align: center; color: red;">ข้อมูลที่อยู่ปัจจุบัน</h5>
+                <hr>
+                <div class="col-md-2 mb-3">
+                    <label for="housenum_a" class="form-label">บ้านเลขที่</label>
+                    <input type="text" class="form-control" id="housenum_a">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="village_a" class="form-label">หมู่ที่</label>
+                    <input type="text" class="form-control" id="village_a">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="villagename_a" class="form-label">ชื่อหมู่บ้าน</label>
+                    <input type="text" class="form-control" id="villagename_a">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="alley_a" class="form-label">ซอย</label>
+                    <input type="text" class="form-control" id="alley_a">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="road_a" class="form-label">ถนน</label>
+                    <input type="text" class="form-control" id="road_a">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="district_a" class="form-label">ตำบล</label>
+                    <input type="text" class="form-control" id="district_a">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="prefecture_a" class="form-label">อำเภอ</label>
+                    <input type="text" class="form-control" id="prefecture_a" null>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="province_a" class="form-label">จังหวัด</label>
+                    <input type="text" class="form-control" id="province_a">
+                </div>
+                <div class="col-md-3 mb-4">
+                    <label for="zipcode_a" class="form-label">รหัสไปรษณีย์</label>
+                    <input type="text" class="form-control" id="zipcode_a"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 5);">
+                </div>
+                <hr>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary"
+                    style="background-color: #6a5a46; border-color: #6a5a46;">อัพเดทข้อมูล</button>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    // Get user_id from sessionStorage
+    const userId = sessionStorage.getItem('user_id');
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        "id": userId
+    });
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch("http://localhost:4025/user/get_user_byid", requestOptions)
+        .then((response) => response.text())
+        .then((result) => {
+            const data = JSON.parse(result);
+            document.getElementById('housenum_o').value = data[0].housenum_o;
+            document.getElementById('village_o').value = data[0].village_o;
+            document.getElementById('villagename_o').value = data[0].villagename_o;
+            document.getElementById('alley_o').value = data[0].alley_o;
+            document.getElementById('road_o').value = data[0].road_o;
+            document.getElementById('district_o').value = data[0].district_o;
+            document.getElementById('prefecture_o').value = data[0].prefecture_o;
+            document.getElementById('province_o').value = data[0].province_o;
+            document.getElementById('zipcode_o').value = data[0].zipcode_o;
+            //////////////////////////////////////////////////////////////////////
+            document.getElementById('housenum_a').value = data[0].housenum_a;
+            document.getElementById('village_a').value = data[0].village_a;
+            document.getElementById('villagename_a').value = data[0].villagename_a;
+            document.getElementById('alley_a').value = data[0].alley_a;
+            document.getElementById('road_a').value = data[0].road_a;
+            document.getElementById('district_a').value = data[0].district_a;
+            document.getElementById('prefecture_a').value = data[0].prefecture_a;
+            document.getElementById('province_a').value = data[0].province_a;
+            document.getElementById('zipcode_a').value = data[0].zipcode_a;
+        })
+        .catch((error) => console.error(error));
+</script>
+<script>
+    let confirmed = false;
+    // เปลี่ยนชื่อ function เป็น updateUserData และเพิ่ม event parameter
+    function updateUserData(event) {
+        event.preventDefault(); // ป้องกันการรีเฟรชหน้าเมื่อกดปุ่ม Update
+        if (!confirmed) {
+            if (confirm("คุณแน่ใจหรือว่าต้องการอัพเดทข้อมูล?")) {
+                confirmed = true;
+            } else {
+                alert("การอัพเดทข้อมูลถูกยกเลิก");
+                location.reload(); // รีเซ็ทหน้าเว็บ
+                return; // ยกเลิกการ submit ถ้าผู้ใช้กด "ยกเลิก"
+            }
+        }
+        // รับค่าจาก input fields HoneO
+        const housenum_o = document.getElementById('housenum_o').value;
+        const village_o = document.getElementById('village_o').value;
+        const villagename_o = document.getElementById('villagename_o').value;
+        const alley_o = document.getElementById('alley_o').value;
+        const road_o = document.getElementById('road_o').value;
+        const district_o = document.getElementById('district_o').value;
+        const prefecture_o = document.getElementById('prefecture_o').value;
+        const province_o = document.getElementById('province_o').value;
+        const zipcode_o = document.getElementById('zipcode_o').value;
+        // รับค่าจาก input fields HoneA
+        const housenum_a = document.getElementById('housenum_a').value;
+        const village_a = document.getElementById('village_a').value;
+        const villagename_a = document.getElementById('villagename_a').value;
+        const alley_a = document.getElementById('alley_a').value;
+        const road_a = document.getElementById('road_a').value;
+        const district_a = document.getElementById('district_a').value;
+        const prefecture_a = document.getElementById('prefecture_a').value;
+        const province_a = document.getElementById('province_a').value;
+        const zipcode_a = document.getElementById('zipcode_a').value;
+        const userId = sessionStorage.getItem('user_id');
+
+        // สร้าง JSON object สำหรับส่งข้อมูล
+        const data = {
+            "id": userId,
+            "housenum_o": housenum_o,
+            "village_o": village_o,
+            "villagename_o": villagename_o,
+            "alley_o": alley_o,
+            "road_o": road_o,
+            "district_o": district_o,
+            "prefecture_o": prefecture_o,
+            "province_o": province_o,
+            "zipcode_o": zipcode_o,
+            "housenum_a": housenum_a,
+            "village_a": village_a,
+            "villagename_a": villagename_a,
+            "alley_a": alley_a,
+            "road_a": road_a,
+            "district_a": district_a,
+            "prefecture_a": prefecture_a,
+            "province_a": province_a,
+            "zipcode_a": zipcode_a
+        };
+
+        // ส่ง request ไปยัง API update_userdetails ด้วย fetch
+        fetch("http://localhost:4025/user/update_address", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'ok') {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Failed to update user details');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('An error occurred while updating user details');
+            });
+    }
+
+    // เพิ่ม event listener สำหรับ form submission
+    document.querySelector('form').addEventListener('submit', updateUserData);
+</script>
+
+</html>

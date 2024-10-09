@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องค์การบริหารส่วนตำบลเมืองพาน</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .login-container {
+            display: flex;
+            border-radius: 15px;
+            overflow: hidden;
+            width: 800px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(yellow, #ffa200);
+            color: rgb(0, 0, 0);
+            position: relative;
+            z-index: 1;
+        }
+
+        .image-container {
+            max-width: 100%;
+            height: auto;
+            flex: 1;
+            padding: 40px;
+            background: #eeeeee;
+            position: relative;
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .image-container,
+            .form-container {
+                padding: 20px;
+            }
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 400px;
+            height: auto;
+            border-radius: 15px 0 0 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="image-container">
+            <img src="/img/logo2.png" alt="Login Image" class="login-image">
+        </div>
+        <div class="form-container">
+            <h1 class="login-title text-center">เข้าสู่ระบบ</h1>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">ชื่อผู้ใช้งาน</label>
+                    <input type="text" class="form-control" id="username" required aria-required="true">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-control" id="password" required aria-required="true">
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-block">เข้าสู่ระบบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel">ข้อผิดพลาด</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                "username": username,
+                "password": password
+            });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4025/user/loginCheck", requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json(); // Parse response as JSON
+                })
+                .then((data) => {
+                    console.log(data);
+
+                    // ตรวจสอบว่ามีค่า date_entry และเป็นวันที่ที่ถูกต้องหรือไม่
+                    if (data.date_entry && !isNaN(Date.parse(data.date_entry))) {
+                        const dateEntry = new Date(data.date_entry);
+                        dateEntry.setDate(dateEntry.getDate() + 1);
+                        const updatedDateEntry = dateEntry.toISOString().split('T')[0]; // แปลงกลับเป็นรูปแบบ YYYY-MM-DD
+                        sessionStorage.setItem('user_date_entry', updatedDateEntry);
+                    } else {
+                        console.log('ไม่มีหรือค่า date_entry ไม่ถูกต้อง');
+                    }
+
+                    sessionStorage.setItem('user_id', data.id);
+                    sessionStorage.setItem('user_st', data.id);
+                    sessionStorage.setItem('user_status', data.user_status);
+                    sessionStorage.setItem('user_name', data.name);
+                    sessionStorage.setItem('name_admin', data.name);
+
+                    if (data.user_status === "admin") {
+                        window.location.href = "overview.html"; // ไปที่หน้า overview.html สำหรับ admin
+                    } else if (data.user_status === "user") {
+                        window.location.href = "overview.html"; // ไปที่หน้า overview.html สำหรับ user
+                    } else {
+                        var errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                        errorModal.show();
+                    }
+                })
+
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

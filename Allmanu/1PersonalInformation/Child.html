@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Table Example</title>
+    <!-- Import Bootstrap 5 CSS file -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-end">
+            <button id="addChildBtn" class="btn btn-primary" style="background-color: #6a5a46; border-color: #6a5a46;" >เพิ่ม</button>
+        </div>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">ชื่อ - นามสกุล</th>
+                    <th scope="col">อายุ</th>
+                    <th scope="col">อาชีพ</th>
+                    <th scope="col" style="text-align: center;">ตัวเลือก</th>
+                </tr>
+            </thead>
+            <tbody id="childTableBody">
+                <!-- Table rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="addChildModal" tabindex="-1" aria-labelledby="addChildModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addChildModalLabel">ข้อมูลบุตร</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addChildForm">
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">ชื่อ - นามสกุล</label>
+                            <input type="text" class="form-control" id="nameInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ageInput" class="form-label">อายุ</label>
+                            <input type="date" class="form-control" id="ageInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="occupationInput" class="form-label">อาชีพ</label>
+                            <select class="form-select" id="occupationInput">
+                                <option value="" disabled selected>-- เลือกอาชีพ --</option>
+                                <option value="พนักงานบริษัท">พนักงานบริษัท</option>
+                                <option value="พนักงานรัฐบาล">พนักงานรัฐบาล</option>
+                                <option value="นักเรียน/นักศึกษา">นักเรียน/นักศึกษา</option>
+                                <option value="พนักงานขาย">พนักงานขาย</option>
+                                <option value="คนงาน/แรงงาน">คนงาน/แรงงาน</option>
+                                <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                                <option value="พนักงานบริการ">พนักงานบริการ</option>
+                                <option value="วิทยากร/อาจารย์">วิทยากร/อาจารย์</option>
+                                <option value="นักเขียน/นักบรรณาธิกร">นักเขียน/นักบรรณาธิกร</option>
+                                <option value="นักวิจัย/นักวิทยาศาสตร์">นักวิจัย/นักวิทยาศาสตร์</option>
+                              </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="submitChildBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">ยืนยันการลบ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    คุณแน่ใจหรือไม่ที่ต้องการลบข้อมูลนี้?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeleteButton">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Get user_id from sessionStorage
+        const userId = sessionStorage.getItem('user_id');
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            "user_id": userId
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        fetch("http://localhost:4025/user/get_child_byuser_id", requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                const data = JSON.parse(result);
+
+                // Get the table body element
+                const tableBody = document.getElementById("childTableBody");
+
+                // Clear existing rows
+                tableBody.innerHTML = "";
+
+                // Loop through the data array
+                data.forEach((child) => {
+                    // Create a new row
+                    const newRow = tableBody.insertRow();
+
+                    // Insert cells into the new row and set their values
+                    const nameCell = newRow.insertCell();
+                    nameCell.textContent = child.name_c;
+
+                    const ageCell = newRow.insertCell();
+                    // Calculate age here
+                    const age_cParts = child.age_c.split('-');
+                    const age_cYear = parseInt(age_cParts[0]);
+                    const age_cMonth = parseInt(age_cParts[1]) - 1; // เริ่มนับเดือนที่ 0
+                    const age_cDay = parseInt(age_cParts[2].split('T')[0]);
+                    const ageDate = new Date(age_cYear, age_cMonth, age_cDay);
+                    const currentDate = new Date();
+                    const diffTime = Math.abs(currentDate - ageDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    let diffYears = Math.floor(diffDays / 365);
+                    let diffMonths = Math.floor((diffDays % 365) / 30);
+                    let diffDaysLeft = diffDays % 30;
+
+                    ageCell.textContent = `${diffYears} ปี ${diffMonths} เดือน`;
+
+                    const occupationCell = newRow.insertCell();
+                    occupationCell.textContent = child.occupation_c;
+
+                    const optionsCell = newRow.insertCell();
+                    optionsCell.classList.add("d-flex", "justify-content-center");
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "ลบ";
+                    deleteButton.classList.add("btn", "btn-danger");
+                    deleteButton.addEventListener("click", () => {
+                        // Show confirmation modal
+                        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        confirmationModal.show();
+
+                        // Handle delete confirmation
+                        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                        confirmDeleteButton.addEventListener('click', () => {
+                            const childId = child.id; // assuming child.id is the ID of the child to delete
+
+                            const myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+
+                            const raw = JSON.stringify({
+                                "id": childId
+                            });
+
+                            const requestOptions = {
+                                method: "POST",
+                                headers: myHeaders,
+                                body: raw,
+                                redirect: "follow"
+                            };
+
+                            fetch("http://localhost:4025/user/dalete_child", requestOptions)
+                                .then((response) => response.text())
+                                .then((result) => {
+                                    console.log(result);
+                                    // Reload the page to refresh the table
+                                    location.reload();
+                                })
+                                .catch((error) => console.error(error));
+                        });
+                    });
+                    optionsCell.appendChild(deleteButton);
+                });
+            })
+            .catch((error) => console.error(error));
+
+        // Get user_id from sessionStorage
+        const addChildBtn = document.getElementById('addChildBtn');
+        addChildBtn.addEventListener('click', () => {
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            modal.show();
+        });
+
+        const submitChildBtn = document.getElementById('submitChildBtn');
+        submitChildBtn.addEventListener('click', () => {
+            const nameInput = document.getElementById('nameInput').value;
+            const ageInput = document.getElementById('ageInput').value;
+            const occupationInput = document.getElementById('occupationInput').value;
+
+            const newChild = {
+                "user_id": userId,
+                "name_c": nameInput,
+                "age_c": ageInput,
+                "occupation_c": occupationInput
+            };
+
+            const addRequestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(newChild),
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:4025/user/add_child", addRequestOptions)
+                .then((response) => response.text())
+                .then((result) => {
+                    console.log(result);
+                    // Reload the page to refresh the table
+                    location.reload();
+                })
+                .catch((error) => console.error(error));
+        });
+    </script>
+</body>
+
+</html>

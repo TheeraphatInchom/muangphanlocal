@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap">
+
+    <style>
+        .site-header {
+            background: linear-gradient(90deg, yellow, #ffa200);
+            padding: 10px 0;
+            /* ปรับขนาดช่องว่างตามต้องการ */
+        }
+
+        .custom-button {
+            border-radius: 5px;
+            /* ให้มุมมน */
+            padding: 8px 15px;
+            /* ขนาดปุ่ม */
+            transition: background-color 0.3s, transform 0.3s;
+            /* การเปลี่ยนแปลง */
+        }
+
+        .custom-button:hover {
+            transform: translateY(-2px);
+            /* เพิ่มเอฟเฟกต์เล็กน้อยเมื่อชี้ */
+        }
+
+
+        .site-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            background-color: #202020;
+        }
+
+        .sidebar .nav-link {
+            padding: 10px 20px;
+            color: #333;
+            border-radius: 0;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #6a5a46;
+            color: #fff;
+        }
+
+        .tabcontent {
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: #ffffff;
+            height: auto;
+        }
+
+        .custom-color {
+            background-color: #6a5a46;
+            border-color: #6a5a46;
+            color: white;
+            cursor: pointer !important;
+        }
+
+        .btn-info:hover {
+            background-color: #ffffff;
+            /* เปลี่ยนสีเมื่อชี้ไปชี้มา */
+            border-color: #6a5a46;
+            /* เปลี่ยนสีเส้นขอบเมื่อชี้ไปชี้มา */
+            color: rgb(0, 0, 0);
+            /* เปลี่ยนสีตัวอักษรเมื่อชี้ไปชี้มา */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Headers -->
+    <header class="site-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="site-logo">องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</h1>
+            <!-- Adjust the container to align the buttons next to each other -->
+            <div class="d-flex align-items-center bg-white p-2 rounded shadow-sm">
+                <button id="settingsButton" class="custom-button me-2" style="background-color: #6a5a46; color: white; border-radius: 5px; padding: 8px 15px; border: none; transition: background-color 0.3s, transform 0.3s;">
+                    จัดการระบบ
+                </button>
+                <button id="logoutButton" class="custom-button btn btn-danger">ออกจากระบบ</button>
+            </div>
+        </div>
+    </header>
+    
+    <br>
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-end">
+            <!-- <button id="addChildBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">เพิ่ม</button> -->
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <select id="yearSelect" class="form-select">
+                        <option selected>เลือกปี</option>
+                    </select>
+                    <button id="printSummaryBtn" class="btn"
+                        style="background-color: #6a5a46; border-color: #6a5a46; color: white;">ปริ้นสรุป</button>
+                </div>
+            </div>
+        </div>
+        <br>
+        <table id="myTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">ชื่อ – นามสกุล</th>
+                    <th scope="col">เครื่องราช</th>
+                    <th scope="col">ชื่อย่อ</th>
+                    <th scope="col">ปีที่ได้รับ</th>
+                </tr>
+            </thead>
+            <tbody id="childTableBody">
+                <!-- Table rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center">
+            <button id="prevPageBtn" class="btn btn-primary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">ย้อนกลับ</button>
+            <button id="nextPageBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">หน้าถัดไป</button>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="/fontfaceobserver.standalone.js"></script>
+    <script>
+
+        function handleViewDetailsButtonClick(child) {
+            sessionStorage.setItem('user_id', child.id);
+            window.location.href = '/home.html';
+        }
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            sessionStorage.removeItem("user_id");
+            sessionStorage.removeItem("user_st");
+            sessionStorage.removeItem("user_status");
+            window.location.href = "/index.html"; // นำผู้ใช้ไปยังหน้า index.html
+        });
+        document.getElementById("settingsButton").addEventListener("click", () => {
+            window.location.href = "/Ahome.html"; // นำผู้ใช้ไปยังหน้า index.html
+        });
+        // Inside renderTablePage function
+        // Get user_id from sessionStorage
+        const userId = sessionStorage.getItem('user_id');
+        let allData = [];
+        const pageSize = 30;
+        let currentPage = 1;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            "user_id": userId
+        });
+
+        const requestOptions = {
+            method: "GET", // เปลี่ยนจาก "POST" เป็น "GET"
+            headers: myHeaders,
+            redirect: "follow"
+        };
+
+        function renderTablePage(data, pageNumber, pageSize) {
+            const startIndex = (pageNumber - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageData = data.slice(startIndex, endIndex);
+
+            // Reverse the order of the pageData array
+            pageData.reverse();
+
+            const tableBody = document.getElementById("childTableBody");
+            tableBody.innerHTML = "";
+
+            pageData.forEach((child) => {
+                const newRow = tableBody.insertRow();
+
+                const userName = newRow.insertCell();
+                userName.textContent = child.userName;
+                const royal_i = newRow.insertCell();
+                royal_i.textContent = child.royal_i;
+                const initials_i = newRow.insertCell();
+                initials_i.textContent = child.initials_i;
+                const year_i = newRow.insertCell();
+                // Assuming child.year_i is a date string, extract and display only the year
+                year_i.textContent = new Date(child.year_i).getFullYear();
+
+            });
+
+        }
+
+        fetch("http://localhost:4025/user/get_insigniaall", requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                allData = JSON.parse(result);
+                // Extract unique years from allData and sort them
+                const uniqueYears = Array.from(new Set(allData.map(item => new Date(item.year_i).getFullYear()))).sort();
+                allData.sort((a, b) => new Date(a.year_i) - new Date(b.year_i));
+                // Populate the yearSelect dropdown with unique years
+                const yearSelect = document.getElementById("yearSelect");
+                uniqueYears.forEach(year => {
+                    const option = document.createElement("option");
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
+                renderTablePage(allData, currentPage, pageSize);
+            })
+            .catch((error) => console.error(error));
+
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            if (currentPage < Math.ceil(allData.length / pageSize)) {
+                currentPage++;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        document.getElementById("printSummaryBtn").addEventListener("click", () => {
+            const selectedYear = parseInt(document.getElementById("yearSelect").value);
+            if (isNaN(selectedYear)) {
+                // If no year is selected, alert the user to select a year first
+                alert("กรุณาเลือกปีก่อน");
+            } else {
+                const filteredData = allData.filter(child => new Date(child.year_i).getFullYear() === selectedYear);
+                generatePDF(filteredData);
+            }
+        });
+
+        function generatePDF(data) {
+
+            const pdfStyles = document.createElement('style');
+            pdfStyles.innerHTML = `
+        th, td {
+            border: none !important; /* This removes the border around each table cell */
+        }
+        .last-row td {
+            border-bottom: 2px solid black !important; /* Adds a black bottom border to the last data row */
+        }
+        .summary-row td {
+            border-top: none !important; /* Ensures the summary row does not have a top border */
+        }
+    `;
+            document.head.appendChild(pdfStyles);
+            const tableBody = document.createElement("table");
+            tableBody.className = "table";
+            tableBody.style.fontFamily = "'Sarabun', sans-serif";
+
+            const headerRow = tableBody.insertRow();
+            const headers = ["ชื่อ - นามสกุล", "เครื่องราช", "ชื่อย่อ", "ปีที่ได้รับ"];
+            headers.forEach((headerText) => {
+                const header = document.createElement("th");
+                header.textContent = headerText;
+                headerRow.appendChild(header);
+            });
+
+            data.forEach((child, index) => {
+                const newRow = tableBody.insertRow();
+
+                const userName = newRow.insertCell();
+                userName.textContent = child.userName;
+                const royal_i = newRow.insertCell();
+                royal_i.textContent = child.royal_i;
+                const initials_i = newRow.insertCell();
+                initials_i.textContent = child.initials_i;
+                const year_i = newRow.insertCell();
+                year_i.textContent = new Date(child.year_i).getFullYear() + 543;
+                // if (index === data.length - 1) {
+                //     newRow.classList.add('last-row');
+                // }
+            });
+
+            // Calculate the total count of unique names
+            const uniqueNames = [...new Set(data.map(child => child.userName))];
+            const totalCount = uniqueNames.length;
+
+            // Add a summary row at the end of the table
+            const summaryRow = tableBody.insertRow();
+            //summaryRow.classList.add('summary-row');
+            const summaryCell = summaryRow.insertCell();
+            summaryCell.colSpan = 4;
+            summaryCell.textContent = `สรุปจำนวนรายชื่อผู้ได้รับ : ${totalCount} คน`;
+            const selectedYear = parseInt(document.getElementById("yearSelect").value);
+            const fileName = `รายงานสรุปผู้ได้รับเครื่องราชปี ${selectedYear}.pdf`;
+            // Generate PDF from the table with selectable/copyable text
+            html2pdf()
+                .set({
+                    margin: 10,
+                    filename: fileName,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2, useCORS: true, logging: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+
+                })
+                .from(tableBody)
+                .save()
+                .then(() => {
+                    // Remove the PDF-specific styles after the PDF is created
+                    document.head.removeChild(pdfStyles);
+                });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <form>
+            <div class="row">
+                <h5 style="text-align: center; color: red;">ข้อมูลบิดา</h5>
+                <hr>
+                <div class="col-md-6 mb-3">
+                    <label for="national_f" class="form-label">รหัสประจำตัวประชาชน</label>
+                    <input type="text" class="form-control" id="national_f"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 13);">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="name_f" class="form-label">ขื่อ – นามสกุล</label>
+                    <input type="text" class="form-control" id="name_f">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="status_f" class="form-label">สถานภาพ</label>
+                    <select class="form-select" id="status_f">
+                        <option value="" disabled selected>-- เลือกสถานภาพ --</option>
+                        <option value="โสด">โสด</option>
+                        <option value="สมรส">สมรส</option>
+                        <option value="อย่าร้าง">อย่าร้าง</option>
+                    </select>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="income_f" class="form-label">รายได้ต่อเดือน</label>
+                    <input type="text" class="form-control" id="income_f">
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="occupation_f" class="form-label">อาชีพ</label>
+                    <select class="form-select" id="occupation_f">
+                        <option value="" disabled selected>-- เลือกอาชีพ --</option>
+                        <option value="พนักงานบริษัท">พนักงานบริษัท</option>
+                        <option value="พนักงานรัฐบาล">พนักงานรัฐบาล</option>
+                        <option value="นักเรียน/นักศึกษา">นักเรียน/นักศึกษา</option>
+                        <option value="พนักงานขาย">พนักงานขาย</option>
+                        <option value="คนงาน/แรงงาน">คนงาน/แรงงาน</option>
+                        <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                        <option value="พนักงานบริการ">พนักงานบริการ</option>
+                        <option value="วิทยากร/อาจารย์">วิทยากร/อาจารย์</option>
+                        <option value="นักเขียน/นักบรรณาธิกร">นักเขียน/นักบรรณาธิกร</option>
+                        <option value="นักวิจัย/นักวิทยาศาสตร์">นักวิจัย/นักวิทยาศาสตร์</option>
+                    </select>
+                </div>
+                <hr>
+                <h5 style="text-align: center; color: red;">ข้อมูลมารดา</h5>
+                <hr>
+                <div class="col-md-6 mb-3">
+                    <label for="national_m" class="form-label">รหัสประจำตัวประชาชน</label>
+                    <input type="text" class="form-control" id="national_m"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 13);">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="name_m" class="form-label">ขื่อ – นามสกุล</label>
+                    <input type="text" class="form-control" id="name_m">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="status_m" class="form-label">สถานภาพ</label>
+                    <select class="form-select" id="status_m">
+                        <option value="" disabled selected>-- เลือกสถานภาพ --</option>
+                        <option value="มีชีวิต">มีชีวิต</option>
+                        <option value="เสียชีวิต">เสียชีวิต</option>
+                        <option value="สมรส">สมรส</option>
+                        <option value="อย่าร้าง">อย่าร้าง</option>
+                    </select>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="income_m" class="form-label">รายได้ต่อเดือน</label>
+                    <input type="text" class="form-control" id="income_m">
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="occupation_m" class="form-label">อาชีพ</label>
+                    <select class="form-select" id="occupation_m">
+                        <option value="" disabled selected>-- เลือกอาชีพ --</option>
+                        <option value="พนักงานบริษัท">พนักงานบริษัท</option>
+                        <option value="พนักงานรัฐบาล">พนักงานรัฐบาล</option>
+                        <option value="นักเรียน/นักศึกษา">นักเรียน/นักศึกษา</option>
+                        <option value="พนักงานขาย">พนักงานขาย</option>
+                        <option value="คนงาน/แรงงาน">คนงาน/แรงงาน</option>
+                        <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                        <option value="พนักงานบริการ">พนักงานบริการ</option>
+                        <option value="วิทยากร/อาจารย์">วิทยากร/อาจารย์</option>
+                        <option value="นักเขียน/นักบรรณาธิกร">นักเขียน/นักบรรณาธิกร</option>
+                        <option value="นักวิจัย/นักวิทยาศาสตร์">นักวิจัย/นักวิทยาศาสตร์</option>
+                        <option value="พนักงานรัฐวิสหกิจ">พนักงานรัฐวิสหกิจ</option>
+                        <option value="อิสระ">อิสระ</option>
+                        <option value="ิอื่นๆ">อื่นๆ</option>
+                    </select>
+                </div>
+                <hr>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary"
+                    style="background-color: #6a5a46; border-color: #6a5a46;">อัพเดทข้อมูล</button>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    // Get user_id from sessionStorage
+    const userId = sessionStorage.getItem('user_id');
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        "id": userId
+    });
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch("http://localhost:4025/user/get_user_byid", requestOptions)
+        .then((response) => response.text())
+        .then((result) => {
+            const data = JSON.parse(result);
+            document.getElementById('national_f').value = data[0].national_f;
+            document.getElementById('name_f').value = data[0].name_f;
+            document.getElementById('status_f').value = data[0].status_f;
+            document.getElementById('income_f').value = formatThaiNumber(data[0].income_f);
+            document.getElementById('occupation_f').value = data[0].occupation_f;
+            //////////////////////////////////////////////////////////////////////
+            document.getElementById('national_m').value = data[0].national_m;
+            document.getElementById('name_m').value = data[0].name_m;
+            document.getElementById('status_m').value = data[0].status_m;
+            document.getElementById('income_m').value = formatThaiNumber(data[0].income_m);
+            document.getElementById('occupation_m').value = data[0].occupation_m;
+        })
+        .catch((error) => console.error(error));
+    function formatThaiNumber(number) {
+        return new Intl.NumberFormat('th-TH').format(number);
+    }
+</script>
+<script>
+    let confirmed = false;
+    // เปลี่ยนชื่อ function เป็น updateUserData และเพิ่ม event parameter
+    function updateUserData(event) {
+        event.preventDefault(); // ป้องกันการรีเฟรชหน้าเมื่อกดปุ่ม Update
+        const national_fn = document.getElementById('national_f').value;
+        const national_mn = document.getElementById('national_m').value;
+
+        if (national_fn === national_mn) {
+            alert("รหัสประจำตัวประชาชนของบิดาและมารดาต้องไม่เหมือนกัน");
+            return;
+        }
+
+        if (!confirmed) {
+            if (confirm("คุณแน่ใจหรือว่าต้องการอัพเดทข้อมูล?")) {
+                confirmed = true;
+            } else {
+                alert("การอัพเดทข้อมูลถูกยกเลิก");
+                location.reload(); // รีเซ็ทหน้าเว็บ
+                return; // ยกเลิกการ submit ถ้าผู้ใช้กด "ยกเลิก"
+            }
+        }
+
+        // รับค่าจาก input fields F
+        const national_f = document.getElementById('national_f').value;
+        const name_f = document.getElementById('name_f').value;
+        const status_f = document.getElementById('status_f').value;
+        const income_f = document.getElementById('income_f').value.replace(/,/g, '');
+        const occupation_f = document.getElementById('occupation_f').value;
+        // รับค่าจาก input fields M
+        const national_m = document.getElementById('national_m').value;
+        const name_m = document.getElementById('name_m').value;
+        const status_m = document.getElementById('status_m').value;
+        const income_m = document.getElementById('income_m').value.replace(/,/g, '');
+        const occupation_m = document.getElementById('occupation_m').value;
+
+
+        // สร้าง JSON object สำหรับส่งข้อมูล
+        const data = {
+            "id": userId,
+            "national_f": national_f,
+            "name_f": name_f,
+            "status_f": status_f,
+            "income_f": income_f,
+            "occupation_f": occupation_f,
+            "national_m": national_m,
+            "name_m": name_m,
+            "status_m": status_m,
+            "income_m": income_m,
+            "occupation_m": occupation_m
+        };
+
+        // ส่ง request ไปยัง API update_userdetails ด้วย fetch
+        fetch("http://localhost:4025/user/update_fmname", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'ok') {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Failed to update user details');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('An error occurred while updating user details');
+            });
+    }
+
+    // เพิ่ม event listener สำหรับ form submission
+    document.querySelector('form').addEventListener('submit', updateUserData);
+</script>
+
+</html>

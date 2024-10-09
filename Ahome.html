@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+.site-header {
+    background: linear-gradient(90deg, yellow, #ffa200);
+    padding: 10px 0; /* ปรับขนาดช่องว่างตามต้องการ */
+}
+
+.custom-button {
+    border-radius: 5px; /* ให้มุมมน */
+    padding: 8px 15px; /* ขนาดปุ่ม */
+    transition: background-color 0.3s, transform 0.3s; /* การเปลี่ยนแปลง */
+}
+
+.custom-button:hover {
+    transform: translateY(-2px); /* เพิ่มเอฟเฟกต์เล็กน้อยเมื่อชี้ */
+}
+
+
+        .site-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            background-color: #202020;
+        }
+
+        .sidebar .nav-link {
+            padding: 10px 20px;
+            color: #333;
+            border-radius: 0;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #FFD700;
+            /* เปลี่ยนเป็นสีเหลือง */
+            color: #fff;
+        }
+
+        .tabcontent {
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: #ffffff;
+            height: auto;
+        }
+
+        .custom-color {
+            background-color: #FFD700;
+            /* เปลี่ยนเป็นสีเหลือง */
+            border-color: #FFD700;
+            /* เปลี่ยนเป็นสีเหลือง */
+            color: white;
+            cursor: pointer !important;
+        }
+
+        .btn-info:hover {
+            background-color: #ffffff;
+            /* เปลี่ยนสีเมื่อชี้ไปชี้มา */
+            border-color: #FFD700;
+            /* เปลี่ยนเป็นสีเหลือง */
+            /* เปลี่ยนสีเส้นขอบเมื่อชี้ไปชี้มา */
+            color: rgb(0, 0, 0);
+            /* เปลี่ยนสีตัวอักษรเมื่อชี้ไปชี้มา */
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Headers -->
+    <header class="site-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="site-logo">องค์การบริหารส่วนตำบลเมืองพาน จังหวัดเชียงราย</h1>
+            <!-- Adjust the container to align the buttons next to each other -->
+            <div class="d-flex align-items-center bg-white p-2 rounded shadow-sm">
+                <button id="settingsButton" class="custom-button me-2" style="background-color: #6a5a46; color: white; border-radius: 5px; padding: 8px 15px; border: none; transition: background-color 0.3s, transform 0.3s;">
+                    ข้อมูลของตนเอง
+                </button>
+                <button id="logoutButton" class="custom-button btn btn-danger">ออกจากระบบ</button>
+            </div>
+        </div>
+    </header>
+    
+    <br>
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-end">
+            <button id="viewListBtn" class="btn btn-secondary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">รายงานสรุปผู้ได้รับเครื่องราชประจำปี</button>
+            <button id="viewListBtn1" class="btn btn-secondary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">รายงานการเข้า - ออกงาน</button>
+            <button id="viewListBtn2" class="btn btn-secondary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">การขอลา</button>
+            <button id="addChildBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">เพิ่มผู้ใช้งาน</button>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="searchNational" placeholder="กรอกเลขบัตรประชาชน"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 13);">
+                    <button id="searchButton" class="btn btn-primary"
+                        style="background-color: #6a5a46; border-color: #6a5a46;">ค้นหา</button>
+                </div>
+            </div>
+        </div>
+        <br>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">รหัสประจำตัวประชาชน</th>
+                    <th scope="col">ขื่อ – นามสกุล</th>
+                    <th scope="col">เบอร์โทรศัพท์</th>
+                    <th scope="col">ชื่อผู้ใช้งาน</th>
+                    <th scope="col">รหัสผ่าน</th>
+                    <th scope="col" id="optionsHeader" style="text-align: center;"></th>
+                </tr>
+            </thead>
+            <tbody id="childTableBody">
+                <!-- Table rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center">
+            <button id="prevPageBtn" class="btn btn-primary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">ย้อนกลับ</button>
+            <button id="nextPageBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">หน้าถัดไป</button>
+        </div>
+    </div>
+    <div class="modal fade" id="addChildModal" tabindex="-1" aria-labelledby="addChildModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addChildModalLabel">เพิ่มผู้ใช้งาน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addChildForm">
+                        <div class="mb-3">
+                            <label for="national" class="form-label">รหัสประจำตัวประชาชน</label>
+                            <input type="text" class="form-control" id="national"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 13);" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">ขื่อ – นามสกุล</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tp_number" class="form-label">เบอร์โทรศัพท์</label>
+                                <input type="text" class="form-control" id="tp_number"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <label for="username" class="form-label">ชื่อผู้ใช้งาน<small
+                                            class="text-danger">***ใส่ได้ไม่เกิน 10 ตัว</small></label>
+                                </div>
+                                <input type="text" class="form-control" id="username" maxlength="10" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <label for="text" class="form-label">รหัสผ่าน<small
+                                            class="text-danger">***ใส่ได้ไม่เกิน 10 ตัว</small></label>
+
+                                </div>
+                                <input type="text" class="form-control" id="password" maxlength="10" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="user_status" class="form-label">สิทธิการเข้าถึง</label>
+                                <select class="form-select" id="user_status" required>
+                                    <option value="user">ผู้ใช้งานทั่วไป</option>
+                                    <option value="admin">ผู้ดูแล</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="submitChildBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">ยืนยันการลบ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    คุณแน่ใจหรือไม่ที่ต้องการลบข้อมูลนี้?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeleteButton">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById("viewListBtn").addEventListener("click", () => {
+            window.location.href = '/reAssessment/reAs.html';
+        });
+        document.getElementById("viewListBtn1").addEventListener("click", () => {
+            window.location.href = '/reAssessment/reTime.html';
+        });
+        document.getElementById("viewListBtn2").addEventListener("click", () => {
+            window.location.href = '/reAssessment/Aleave.html';
+        });
+        document.getElementById("searchButton").addEventListener("click", () => {
+            const searchNational = document.getElementById("searchNational").value;
+            const filteredData = allData.filter((child) => child.national.includes(searchNational));
+            renderTablePage(filteredData, 1, pageSize);
+        });
+        function handleViewDetailsButtonClick(child) {
+            sessionStorage.setItem('user_id', child.id);
+            sessionStorage.setItem('user_name', child.name); // เพิ่มส่วนนี้เพื่อเก็บชื่อของผู้ใช้
+            window.location.href = '/overview.html';
+        }
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            sessionStorage.removeItem("user_id");
+            sessionStorage.removeItem("user_st");
+            sessionStorage.removeItem("user_status");
+            window.location.href = "/index.html"; // นำผู้ใช้ไปยังหน้า index.html
+        });
+        document.getElementById("settingsButton").addEventListener("click", () => {
+            
+            window.location.href = "/overview.html"; // นำผู้ใช้ไปยังหน้า index.html
+        });
+        // Inside renderTablePage function
+        if (sessionStorage.getItem('user_status') === 'admin') {
+            const optionsHeader = document.getElementById('optionsHeader');
+            optionsHeader.textContent = 'ตัวเลือก';
+        }
+        window.onload = function () {
+            // Check the 'user_status' from sessionStorage
+            sessionStorage.setItem('user_id', sessionStorage.getItem('user_st'));
+            sessionStorage.setItem('user_name', sessionStorage.getItem('name_admin'));
+            if (sessionStorage.getItem('user_status') === 'user') {
+                // Select the optionsHeader element
+                const optionsHeader = document.getElementById('optionsHeader');
+                const addChildBtn = document.getElementById('addChildBtn');
+                // Check if the optionsHeader element exists
+                if (optionsHeader) {
+                    // Remove the optionsHeader element from its parent
+                    optionsHeader.parentNode.removeChild(optionsHeader);
+                }
+                if (addChildBtn) {
+                    // Remove the button element from its parent
+                    addChildBtn.parentNode.removeChild(addChildBtn);
+                }
+            }
+        };
+        // Get user_id from sessionStorage
+        const userId = sessionStorage.getItem('user_id');
+        let allData = [];
+        const pageSize = 10;
+        let currentPage = 1;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            "user_id": userId
+        });
+
+        const requestOptions = {
+            method: "GET", // เปลี่ยนจาก "POST" เป็น "GET"
+            headers: myHeaders,
+            redirect: "follow"
+        };
+
+        function renderTablePage(data, pageNumber, pageSize) {
+            const startIndex = (pageNumber - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort data by payment date in descending order
+            const pageData = sortedData.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById("childTableBody");
+            tableBody.innerHTML = "";
+
+            pageData.forEach((child) => {
+                const newRow = tableBody.insertRow();
+
+                const national = newRow.insertCell();
+                national.textContent = child.national;
+                const name = newRow.insertCell();
+                name.textContent = child.name;
+                const tp_number = newRow.insertCell();
+                tp_number.textContent = child.tp_number;
+                const username = newRow.insertCell();
+                username.textContent = child.username;
+                const password = newRow.insertCell();
+                password.textContent = child.password;
+
+                if (sessionStorage.getItem('user_status') === 'admin') {
+                    const optionsCell = newRow.insertCell();
+                    optionsCell.classList.add('d-flex', 'justify-content-center');
+                    const viewDetailsButton = document.createElement('button');
+                    viewDetailsButton.textContent = 'เข้าถึงข้อมูล';
+                    viewDetailsButton.classList.add('btn', 'btn-info', 'me-2', 'custom-color');
+                    viewDetailsButton.addEventListener('click', () => {
+                        handleViewDetailsButtonClick(child);
+                    });
+                    optionsCell.appendChild(viewDetailsButton);
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "ลบ";
+                    deleteButton.classList.add("btn", "btn-danger");
+                    deleteButton.addEventListener("click", () => {
+                        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        confirmationModal.show();
+
+                        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                        confirmDeleteButton.addEventListener('click', () => {
+                            const childId = child.id;
+
+                            const myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+
+                            const raw = JSON.stringify({
+                                "user_id": childId
+                            });
+
+                            const requestOptions = {
+                                method: "POST",
+                                headers: myHeaders,
+                                body: raw,
+                                redirect: "follow"
+                            };
+
+                            fetch("http://localhost:4025/user/delete_data", requestOptions)
+                                .then((response) => response.text())
+                                .then((result) => {
+                                    console.log(result);
+                                    location.reload();
+                                })
+                                .catch((error) => console.error(error));
+                        });
+                    });
+                    optionsCell.appendChild(deleteButton);
+                }
+            });
+        }
+
+        fetch("http://localhost:4025/user/get_userall", requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                allData = JSON.parse(result);
+                renderTablePage(allData, currentPage, pageSize);
+            })
+            .catch((error) => console.error(error));
+
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            if (currentPage < Math.ceil(allData.length / pageSize)) {
+                currentPage++;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        const addChildBtn = document.getElementById('addChildBtn');
+        addChildBtn.addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            modal.show();
+        });
+
+        const submitChildBtn = document.getElementById('submitChildBtn');
+        submitChildBtn.addEventListener('click', async () => {
+            const national = document.getElementById('national').value;
+            const name = document.getElementById('name').value;
+            const tp_number = document.getElementById('tp_number').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user_status = document.getElementById('user_status').value;
+
+            // Check if the national ID is a duplicate
+            const isDuplicate = allData.some(child => child.national === national);
+            const usernames = allData.some(child => child.username === username);
+            if (isDuplicate) {
+                alert('รหัสประจำตัวประชาชนซ้ำ กรุณากรอกใหม่');
+                return;
+            }
+            if (usernames) {
+                alert('ชื่อผู้ใช้งานซ้ำ กรุณากรอกใหม่');
+                return;
+            }
+            // Assuming the server expects a JSON payload
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                national: national,
+                name: name,
+                tp_number: tp_number,
+                username: username,
+                password: password,
+                user_status: user_status
+            });
+
+            const requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            try {
+                const response = await fetch('http://localhost:4025/user/add_user', requestOptions);
+                const result = await response.json(); // Assuming the server responds with JSON
+                console.log(result);
+                location.reload(); // Refresh the page to show the updated list
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+    </script>
+    <script>
+        // Get the input element
+        var input = document.getElementById("searchNational");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                // Cancel the default action, if needed
+                event.preventDefault();
+                // Trigger the button element with a click
+                document.getElementById("searchButton").click();
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            // ตรวจสอบว่า sessionStorage มีค่า user_id หรือไม่
+            if (!sessionStorage.getItem('user_id')) {
+                // ไปยังหน้า index.html หากไม่มีค่า user_id
+                window.location.href = 'index.html';
+            }
+        });
+        function closeModal() {
+            location.reload(); // โหลดหน้าเว็บใหม่
+            document.getElementById("addChildModal").classList.remove("show"); // ปิด modal
+            document.body.classList.remove("modal-open"); // ปิดใช้งาน modal-open class ใน body
+            document.body.style.paddingRight = ""; // ล้างการกำหนด paddingRight ใน body
+        }
+    </script>
+</body>
+
+</html>

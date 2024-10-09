@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Table Example</title>
+    <!-- Import Bootstrap 5 CSS file -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        .ui-autocomplete {
+            z-index: 1070 !important;
+            /* Higher than modal z-index */
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-end">
+            <button id="addChildBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">เพิ่ม</button>
+        </div>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">เลขที่ตำแหน่ง</th>
+                    <th scope="col">ประเภทบุคลากร</th>
+                    <th scope="col">ตำแหน่งงาน</th>
+                    <th scope="col">เลขที่คำสั่ง</th>
+                    <th scope="col">ช่วงเวลาสัญญา</th>
+                    <th scope="col">สถานะ</th>
+                    <th scope="col">ไฟล์</th>
+                    <th scope="col" id="optionsHeader" style="text-align: center;"></th>
+                </tr>
+            </thead>
+            <tbody id="childTableBody">
+                <!-- Table rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center">
+            <button id="prevPageBtn" class="btn btn-primary me-2"
+                style="background-color: #6a5a46; border-color: #6a5a46;">ย้อนกลับ</button>
+            <button id="nextPageBtn" class="btn btn-primary"
+                style="background-color: #6a5a46; border-color: #6a5a46;">หน้าถัดไป</button>
+        </div>
+    </div>
+    <div class="modal fade" id="addChildModal" tabindex="-1" aria-labelledby="addChildModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addChildModalLabel">สังกัตบุคลากร</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addChildForm">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="cositionc_o" class="form-label">เลขที่ตำแหน่ง</label>
+                                <input type="text" class="form-control" id="cositionc_o" required>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label for="personnelc_o" class="form-label">ประเภทบุคลากร</label>
+                                <select class="form-select" id="personnelc_o" required>
+                                    <option value="" disabled selected>-- เลือกประเภท --</option>
+                                    <option value="ข้าราชการ">ข้าราชการ</option>
+                                    <option value="พนักงานส่วนตำบล">พนักงานส่วนตำบล</option>
+                                    <option value="ลูกจ้างประจำ">ลูกจ้างประจำ</option>
+                                    <option value="ลูกจ้างชั่วคราว">ลูกจ้างชั่วคราว</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="jobc_o" class="form-label">ตำแหน่งงาน</label>
+                                <input type="text" class="form-control" id="jobc_o" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="orderc_o" class="form-label">เลขที่คำสั่ง</label>
+                                <input type="text" class="form-control" id="orderc_o" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="periodsc_o" class="form-label">วันที่เริ่ม</label>
+                                <input type="date" class="form-control" id="periodsc_o" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="periodec_o" class="form-label">วันที่สิ้นสุด</label>
+                                <input type="date" class="form-control" id="periodec_o" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="statusc_o" class="form-label">สถานะ</label>
+                                <select class="form-select" id="statusc_o" required>
+                                    <option value="" disabled selected>-- เลือกสถานะ --</option>
+                                    <option value="ปัจจุบัน">ปัจจุบัน</option>
+                                    <option value="ประวัติ">ประวัติ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label for="doc_file" class="form-label">ไฟล์</label>
+                                <input type="file" class="form-control" id="doc_file" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">ปิด</button>
+                    <button type="button" class="btn btn-primary" id="submitChildBtn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">ยืนยันการลบ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    คุณแน่ใจหรือไม่ที่ต้องการลบข้อมูลนี้?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeleteButton">ลบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Import Bootstrap 5 JavaScript file (if using Tooltip or Popover) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var positions = [
+                "นายกองค์การบริหารส่วนตำบล",
+                "รองนายกองค์การบริหารส่วนตำบล",
+                "ปลัดองค์การบริหารส่วนตำบล",
+                "รองปลัดองค์การบริหารส่วนตำบล",
+                "หัวหน้าส่วนราชการ",
+                "หัวหน้าสำนักปลัดองค์การบริหารส่วนตำบล",
+                "เจ้าหน้าที่บริหารงานทั่วไป",
+                "เจ้าหน้าที่ธุรการ",
+                "เจ้าหน้าที่บันทึกข้อมูล",
+                "เจ้าหน้าที่การเงินและบัญชี",
+                "นักวิชาการเงินและบัญชี",
+                "เจ้าหน้าที่พัสดุ",
+                "เจ้าหน้าที่วิเคราะห์นโยบายและแผน",
+                "นักวิเคราะห์นโยบายและแผน",
+                "เจ้าหน้าที่พัฒนาชุมชน",
+                "นักพัฒนาชุมชน",
+                "เจ้าหน้าที่สาธารณสุข",
+                "นักวิชาการสาธารณสุข",
+                "พยาบาลวิชาชีพ",
+                "ครูศูนย์พัฒนาเด็กเล็ก",
+                "นักวิชาการศึกษา",
+                "นักวิชาการเกษตร",
+                "นักวิชาการสิ่งแวดล้อม",
+                "เจ้าหน้าที่ป้องกันและบรรเทาสาธารณภัย",
+                "นักวิชาการป้องกันและบรรเทาสาธารณภัย",
+                "เจ้าหน้าที่นิติกร",
+                "เจ้าหน้าที่ธุรการ",
+                "เจ้าหน้าที่บันทึกข้อมูล"
+            ];
+
+            // เปิดใช้งาน autocomplete
+            $("#jobc_o").autocomplete({
+                source: positions,
+                minLength: 1
+            });
+        });
+    </script>
+    <script>
+        function closeModal() {
+            location.reload(); // โหลดหน้าเว็บใหม่
+            document.getElementById("addChildModal").classList.remove("show"); // ปิด modal
+            document.body.classList.remove("modal-open"); // ปิดใช้งาน modal-open class ใน body
+            document.body.style.paddingRight = ""; // ล้างการกำหนด paddingRight ใน body
+        }
+        // Inside renderTablePage function
+        if (sessionStorage.getItem('user_status') === 'admin') {
+            const optionsHeader = document.getElementById('optionsHeader');
+            optionsHeader.textContent = 'ตัวเลือก';
+        }
+        window.onload = function () {
+            // Check the 'user_status' from sessionStorage
+            if (sessionStorage.getItem('user_status') === 'user') {
+                // Select the optionsHeader element
+                const optionsHeader = document.getElementById('optionsHeader');
+                const addChildBtn = document.getElementById('addChildBtn');
+                // Check if the optionsHeader element exists
+                if (optionsHeader) {
+                    // Remove the optionsHeader element from its parent
+                    optionsHeader.parentNode.removeChild(optionsHeader);
+                }
+                if (addChildBtn) {
+                    // Remove the button element from its parent
+                    addChildBtn.parentNode.removeChild(addChildBtn);
+                }
+            }
+        };
+        // Get user_id from sessionStorage
+        const userId = sessionStorage.getItem('user_id');
+        let allData = [];
+        const pageSize = 8;
+        let currentPage = 1;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            "user_id": userId
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        function renderTablePage(data, pageNumber, pageSize) {
+            const startIndex = (pageNumber - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            // Filter out current records
+            const currentData = data.filter((child) => child.statusc_o === 'ปัจจุบัน');
+            const sortedCurrentData = currentData.sort((a, b) => a.id - b.id);
+
+            // Filter out non-current records
+            const nonCurrentData = data.filter((child) => child.statusc_o !== 'ปัจจุบัน');
+            const sortedNonCurrentData = nonCurrentData.sort((a, b) => a.id - b.id);
+
+            // Concatenate current and non-current data
+            const sortedData = sortedCurrentData.concat(sortedNonCurrentData);
+            const pageData = sortedData.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById("childTableBody");
+            tableBody.innerHTML = "";
+
+            pageData.forEach((child) => {
+                const newRow = tableBody.insertRow();
+
+                const cositionc_o = newRow.insertCell();
+                cositionc_o.textContent = child.cositionc_o;
+                const personnelc_o = newRow.insertCell();
+                personnelc_o.textContent = child.personnelc_o;
+                const jobc_o = newRow.insertCell();
+                jobc_o.textContent = child.jobc_o;
+                const orderc_o = newRow.insertCell();
+                orderc_o.textContent = child.orderc_o;
+                // Create variables for the date cells
+                const periodsc_o = newRow.insertCell();
+                const periodsDate = new Date(child.periodsc_o);
+                const formattedPeriodsDate = periodsDate.toLocaleDateString('en-GB');
+                const periodeDate = new Date(child.periodec_o);
+                const formattedPeriodeDate = periodeDate.toLocaleDateString('en-GB');
+                // Insert formatted dates into the table cell
+                periodsc_o.innerHTML = `${formattedPeriodsDate} - ${formattedPeriodeDate}`;
+                const statusc_o = newRow.insertCell();
+                statusc_o.textContent = child.statusc_o;
+
+                const pdfCell = newRow.insertCell();
+                if (child.doc_file) {
+                    const pdfLink = document.createElement('a');
+                    pdfLink.href = `http://localhost:4025/${child.doc_file}`;
+                    pdfLink.innerHTML = '<i class="bi bi-file-pdf fs-4"></i>'; // Use fs-4 class to make the icon larger
+                    pdfLink.classList.add("d-flex", "justify-content-center");
+                    pdfLink.target = '_blank';
+                    pdfCell.appendChild(pdfLink);
+                }
+
+
+                if (sessionStorage.getItem('user_status') === 'admin') {
+                    const optionsCell = newRow.insertCell();
+                    optionsCell.classList.add("d-flex", "justify-content-center");
+                    const editButton = document.createElement("button");
+                    editButton.textContent = "แก้ไข";
+                    editButton.classList.add("btn", "btn-warning", "me-2"); // Added me-2 for spacing
+                    editButton.addEventListener("click", () => {
+                        // Code to handle edit functionality goes here
+                        handleEditButtonClick(child);
+                    });
+                    // // Append edit button to the cell
+                    optionsCell.appendChild(editButton);
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "ลบ";
+                    deleteButton.classList.add("btn", "btn-danger");
+                    deleteButton.addEventListener("click", () => {
+                        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                        confirmationModal.show();
+
+                        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                        confirmDeleteButton.addEventListener('click', () => {
+                            const childId = child.id;
+
+                            const myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+
+                            const raw = JSON.stringify({
+                                "id": childId
+                            });
+
+                            const requestOptions = {
+                                method: "POST",
+                                headers: myHeaders,
+                                body: raw,
+                                redirect: "follow"
+                            };
+
+                            fetch("http://localhost:4025/user/dalete_contract", requestOptions)
+                                .then((response) => response.text())
+                                .then((result) => {
+                                    console.log(result);
+                                    location.reload();
+                                })
+                                .catch((error) => console.error(error));
+                        });
+                    });
+                    optionsCell.appendChild(deleteButton);
+                }
+            });
+        }
+
+        fetch("http://localhost:4025/user/get_contract_byuser_id", requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                allData = JSON.parse(result);
+                renderTablePage(allData, currentPage, pageSize);
+            })
+            .catch((error) => console.error(error));
+
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            if (currentPage < Math.ceil(allData.length / pageSize)) {
+                currentPage++;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTablePage(allData, currentPage, pageSize);
+            }
+        });
+
+        const addChildBtn = document.getElementById('addChildBtn');
+        addChildBtn.addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            modal.show();
+        });
+
+        const submitChildBtn = document.getElementById('submitChildBtn');
+        submitChildBtn.addEventListener('click', async () => {
+            const cositionc_o = document.getElementById('cositionc_o').value;
+            const personnelc_o = document.getElementById('personnelc_o').value;
+            const jobc_o = document.getElementById('jobc_o').value;
+            const orderc_o = document.getElementById('orderc_o').value;
+            const periodsc_o = document.getElementById('periodsc_o').value;
+            const periodec_o = document.getElementById('periodec_o').value;
+            const statusc_o = document.getElementById('statusc_o').value;
+            const doc_file = document.getElementById('doc_file').files[0];
+
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            formData.append('cositionc_o', cositionc_o);
+            formData.append('personnelc_o', personnelc_o);
+            formData.append('jobc_o', jobc_o);
+            formData.append('orderc_o', orderc_o);
+            formData.append('periodsc_o', periodsc_o);
+            formData.append('periodec_o', periodec_o);
+            formData.append('statusc_o', statusc_o);
+            if (doc_file) {
+                formData.append('doc_file', doc_file);
+            }
+
+
+            try {
+                const response = await fetch('http://localhost:4025/user/add_contract', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                console.log(result);
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function handleEditButtonClick(child) {
+            const addChildModal = new bootstrap.Modal(document.getElementById('addChildModal'));
+            const startDate = new Date(child.periodsc_o.split('T')[0]);
+            const endDate = new Date(child.periodec_o.split('T')[0]);
+
+            // Add one day to each date
+            startDate.setDate(startDate.getDate() + 1);
+            endDate.setDate(endDate.getDate() + 1);
+
+            // Convert dates back to strings in the YYYY-MM-DD format
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+
+            document.getElementById('cositionc_o').value = child.cositionc_o;
+            document.getElementById('personnelc_o').value = child.personnelc_o;
+            document.getElementById('jobc_o').value = child.jobc_o;
+            document.getElementById('orderc_o').value = child.orderc_o;
+            document.getElementById('periodsc_o').value = startDateStr;
+            document.getElementById('periodec_o').value = endDateStr;
+            document.getElementById('statusc_o').value = child.statusc_o;
+            document.getElementById('doc_file').files[0] = child.doc_file;
+
+            addChildModal.show();
+
+            // Remove the event listener for the submit button
+            const submitChildBtn = document.getElementById('submitChildBtn');
+            const newSubmitChildBtn = submitChildBtn.cloneNode(true);
+            submitChildBtn.parentNode.replaceChild(newSubmitChildBtn, submitChildBtn);
+
+            const saveButton = document.getElementById('submitChildBtn');
+            saveButton.addEventListener('click', () => {
+                const formData = new FormData();
+                formData.append('id', child.id); // ส่ง id ของแถวที่ต้องการแก้ไขไปด้วย
+                formData.append('user_id', userId);
+                formData.append('cositionc_o', document.getElementById('cositionc_o').value);
+                formData.append('personnelc_o', document.getElementById('personnelc_o').value);
+                formData.append('jobc_o', document.getElementById('jobc_o').value);
+                formData.append('orderc_o', document.getElementById('orderc_o').value);
+                formData.append('periodsc_o', document.getElementById('periodsc_o').value);
+                formData.append('periodec_o', document.getElementById('periodec_o').value);
+                formData.append('statusc_o', document.getElementById('statusc_o').value);
+
+                // Assuming 'existing_doc_name' and 'existing_doc_file' are the fields or variables holding the current file details
+                // Append existing file details to FormData if no new file is selected
+                const fileInput = document.getElementById('doc_file');
+                if (fileInput.files.length > 0) {
+                    formData.append('doc_file', fileInput.files[0]);
+                }
+
+                const updateRequestOptions = {
+                    method: "POST",
+                    body: formData,
+                    redirect: "follow"
+                };
+
+                fetch("http://localhost:4025/user/update_contract", updateRequestOptions)
+                    .then((response) => response.text())
+                    .then((result) => {
+                        console.log(result);
+                        location.reload();
+                    })
+                    .catch((error) => console.error(error));
+            });
+        }
+
+    </script>
+</body>
+
+</html>
